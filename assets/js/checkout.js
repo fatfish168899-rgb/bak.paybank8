@@ -50,6 +50,14 @@ const checkoutFetchDefaults = {
     referrerPolicy: 'no-referrer'
 };
 
+/** 接口返回的 icon 相对路径始终拼源站，避免 API_BASE 为 Pages 同域时指错主机 */
+function getUpstreamAssetBase() {
+    const o = typeof window.CHECKOUT_UPSTREAM_ORIGIN !== 'undefined' ? window.CHECKOUT_UPSTREAM_ORIGIN : '';
+    const t = String(o || '').trim().replace(/\/$/, '');
+    if (t) return t + '/';
+    return getCheckoutApiBase();
+}
+
 const I18N = {
     km: {
         timer_hint: "សូមបង់ប្រាក់ក្នុងកំឡុងពេលនេះ ប្រព័ន្ធនឹងទូទាត់ដោយស្វ័យប្រវត្ត",
@@ -434,24 +442,19 @@ async function generateFancyCanvas(qrSource, bankName, orderNo) {
         };
 
         const logo = new Image();
-        const apiBase = window.API_BASE || '';
-        const logoPath = apiBase + "assets/img/bank_logo/bakong_logo.png";
-
-        if (logoPath) {
-            logo.src = logoPath;
-            logo.onload = () => {
-                const lSize = 40, p = 4;
-                const lx = (width - lSize) / 2, ly = 20 + (200 - lSize) / 2;
-                ctx.fillStyle = "#FFFFFF";
-                ctx.beginPath();
-                if (ctx.roundRect) ctx.roundRect(lx - p, ly - p, lSize + p * 2, lSize + p * 2, 8);
-                else ctx.rect(lx - p, ly - p, lSize + p * 2, lSize + p * 2);
-                ctx.fill();
-                ctx.drawImage(logo, lx, ly, lSize, lSize);
-                finalize();
-            };
-            logo.onerror = finalize;
-        } else { finalize(); }
+        logo.src = 'assets/img/bank_logo/bakong_logo.png';
+        logo.onload = () => {
+            const lSize = 40, p = 4;
+            const lx = (width - lSize) / 2, ly = 20 + (200 - lSize) / 2;
+            ctx.fillStyle = "#FFFFFF";
+            ctx.beginPath();
+            if (ctx.roundRect) ctx.roundRect(lx - p, ly - p, lSize + p * 2, lSize + p * 2, 8);
+            else ctx.rect(lx - p, ly - p, lSize + p * 2, lSize + p * 2);
+            ctx.fill();
+            ctx.drawImage(logo, lx, ly, lSize, lSize);
+            finalize();
+        };
+        logo.onerror = finalize;
     });
 }
 
@@ -509,14 +512,15 @@ window.switchBank = async function (bankName, isPick = false) {
     if (infoArea) infoArea.classList.add('d-none');
 
     try {
-        const apiBase = window.API_BASE || '';
-        const url = apiBase + ((isPick || config.checkoutMode === 'pick') ? 'api/assign_card.php' : 'api/switch_bank.php');
+        const path = (isPick || config.checkoutMode === 'pick') ? 'api/assign_card.php' : 'api/switch_bank.php';
+        const url = checkoutApiPostUrl(path);
+        if (!url) throw new Error('API_BASE missing');
 
-        // 增加控制器以支持请求超时 (V27.6)
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒超时
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
 
         const response = await fetch(url, {
+            ...checkoutFetchDefaults,
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ order_no: config.orderNo, bank_name: bankName, token: currentToken }),
@@ -596,8 +600,14 @@ document.addEventListener('DOMContentLoaded', function () {
         const configEl = document.getElementById('checkout-config');
         if (!configEl) return;
         try {
-            const apiBase = window.API_BASE || '';
-            const res = await fetch(`${apiBase}api/check_order.php?order_no=${configEl.dataset.orderNo}&token=${currentToken || getUrlToken()}`);
+            const onoPoll = configEl.dataset.orderNo;
+            if (!onoPoll) return;
+            const pollUrl = checkoutApiGetUrl('api/check_order.php', {
+                order_no: onoPoll,
+                token: currentToken || getUrlToken()
+            });
+            if (!pollUrl) return;
+            const res = await fetch(pollUrl, checkoutFetchDefaults);
             const json = await res.json();
             if (json.status === 'paid') {
                 clearInterval(statusPoller);
@@ -646,7 +656,6 @@ document.addEventListener('DOMContentLoaded', function () {
 async function initPage() {
     const ono = getUrlOrderNo();
     const tkn = getUrlToken();
-    const apiBase = window.API_BASE || '';
 
     if (!ono) {
         console.error("Missing order_no");
@@ -655,8 +664,22 @@ async function initPage() {
         return;
     }
 
+    if (!getCheckoutApiBase()) {
+        console.error('API_BASE 未配置');
+        const glLoading = document.getElementById('page-loading');
+        if (glLoading) glLoading.style.display = 'none';
+        const container = document.querySelector('.checkout-container');
+        if (container) container.style.opacity = '1';
+        const ph = document.getElementById('selection-placeholder');
+        if (ph) {
+            ph.innerHTML = '<div class="error-overlay py-5"><h5>配置错误</h5><p class="text-muted small">未设置 API_BASE</p></div>';
+        }
+        return;
+    }
+
     try {
-        const res = await fetch(`${apiBase}api/get_order_details.php?order_no=${ono}&token=${tkn}`);
+        const detailsUrl = checkoutApiGetUrl('api/get_order_details.php', { order_no: ono, token: tkn });
+        const res = await fetch(detailsUrl, checkoutFetchDefaults);
         if (!res.ok) throw new Error('API request failed');
         const json = await res.json();
 
@@ -761,7 +784,7 @@ async function initPage() {
                 <div class="error-overlay py-5">
                     <i class="fa-solid fa-triangle-exclamation fa-3x mb-3 text-warning"></i>
                     <h5 class="fw-bold">检测到连接异常</h5>
-                    <p class="text-muted small">无法加载订单数据，请检查后端 API 域名是否配置正确</p>
+                    <p class="text-muted small">无法加载订单数据。Pages 部署需包含 <code class="small">functions/api/[[path]].js</code> 转发；或检查源站与 <code class="small">CHECKOUT_UPSTREAM_ORIGIN</code>。</p>
                     <button class="btn btn-sm btn-outline-primary px-4 rounded-pill mt-2" onclick="window.location.reload()"><i class="fa-solid fa-rotate me-2"></i>点击重试</button>
                 </div>`;
         }
@@ -781,8 +804,19 @@ function renderBankPillsInternal(banks, activeName) {
         pill.onclick = () => window.switchBank(b.name);
 
         const iconName = (b.name.toLowerCase() === 'ac' || b.name.toLowerCase() === 'acleda') ? 'acleda' : b.name.toLowerCase();
-        const apiBase = window.API_BASE || '';
-        pill.innerHTML = `<img src="assets/img/bank/${iconName}.jpg" class="bank-icon" onerror="this.onerror=null; this.src='${apiBase + b.icon}';">`;
+        const iconPath = (b.icon || '').replace(/^\//, '');
+        const fallbackSrc = iconPath ? (getUpstreamAssetBase() + iconPath) : '';
+        const img = document.createElement('img');
+        img.className = 'bank-icon';
+        img.src = 'assets/img/bank/' + iconName + '.jpg';
+        img.alt = b.name || '';
+        if (fallbackSrc) {
+            img.addEventListener('error', function onIconFail() {
+                img.removeEventListener('error', onIconFail);
+                img.src = fallbackSrc;
+            });
+        }
+        pill.appendChild(img);
         container.appendChild(pill);
     });
 }
