@@ -6,8 +6,8 @@
 const I18N = {
     km: {
         timer_hint: "សូមបង់ប្រាក់ក្នុងកំឡុងពេលនេះ ប្រព័ន្ធនឹងទូទាត់ដោយស្វ័យប្រវត្ត",
-        placeholder_title: "ទូទាត់តាម Bakong",
-        placeholder_desc: "ជ្រើស Bakong ដើម្បីបង្ហាញកូដ KHQR",
+        placeholder_title: "សូមជ្រើសរើសធនាគារបង់ប្រាក់របស់អ្នក",
+        placeholder_desc: "សូមជ្រើសរើសធនាគារដើម្បីបង្ហាញកូដបង់ប្រាក់",
         instruction: "អ្នកអាចស្កេនកូដបង់ប្រាក់ ឬចម្លងគណនីផ្ទេរប្រាក់ដោយដៃ",
         amount_label: "ចំនួនទឹកប្រាក់ត្រូវបង់",
         amount_warning: "សូមប្រាកដថាចំនួនទឹកប្រាក់ផ្ទេរដូចគ្នានឹងចំនួនត្រូវបង់ ប្រព័ន្ធនឹងទូទាត់ដោយស្វ័យប្រវត្ត",
@@ -25,24 +25,23 @@ const I18N = {
         save_qr: "រក្សាទុកកូដ QR ទៅកាន់អាល់ប៊ុម",
         save_hint: "* បន្ទាប់ពីរក្សាទុក សូមបើក App ធនាគារ ហើយជ្រើសរើសរូបភាព",
         assigning: "កំពុងបែងចែកគណនី...",
-        no_bank_card: "មិនមានគណនី Bakong ដែលអាចប្រើបាន សូមព្យាយាមម្តងទៀត",
+        no_bank_card: "ធនាគារនេះមិនមានគណនីទេ សូមជ្រើសរើសធនាគារផ្សេងទៀត",
         net_err: "កំហុសបណ្តាញ សូមព្យាយាមម្តងទៀត",
         order_no_label: "លេខបញ្ជាទិញ",
         bank_label_row: "ធនាគារទទួល",
-        support: "ជំនួយអតិថិជន",
-        help: "របៀបបង់ប្រាក់",
-        close: "យល់ព្រម",
+        order_expired: "ការបញ្ជាទិញបានហួសពេល!",
+        expired_desc: "ពេលវេលាបង់ប្រាក់បានផុតកំណត់ហើយ ដើម្បីសុវត្ថិភាពមូលនិធិ សូមចាប់ផ្តើមការបង់ប្រាក់ឡើងវិញ។ កូដ QR បច្ចុប្បន្នបានហួសសុពលភាពហើយ។",
+        refresh_btn: "ព្យាយាមម្តងទៀត",
         contact_us: "ទាក់ទងមកយើង",
         help_guide: "ការណែនាំ",
+        help: "របៀបបង់ប្រាក់",
         click_close: "ចុចលើរូបភាពដើម្បីបិទ",
-        help_img: "/assets/img/topup_hint_km.jpg?v=1.0",
-        merchant_ref: "លេខយោងអាជីវករ",
-        supported_banks_hint: "សូមប្រើ Bakong ឬ App ធនាគារដែលគាំទ្រ KHQR"
+        help_img: "/assets/img/topup_hint_km.jpg"
     },
     en: {
         timer_hint: "Please pay within this time, system will auto-credit",
-        placeholder_title: "Pay with Bakong",
-        placeholder_desc: "Select Bakong to show KHQR",
+        placeholder_title: "Select your payment bank",
+        placeholder_desc: "Select a bank to show payment QR",
         instruction: "Scan QR code or copy account for manual transfer",
         amount_label: "Total Amount Due",
         amount_warning: "Ensure transfer amount matches due amount for auto-credit",
@@ -60,24 +59,23 @@ const I18N = {
         save_qr: "Save QR to Album",
         save_hint: "* After saving, open banking app and select this photo",
         assigning: "Assigning account...",
-        no_bank_card: "No available Bakong account, please try again",
+        no_bank_card: "No account for this bank, please choose another",
         net_err: "Network error, please try again",
         order_no_label: "Order No",
         bank_label_row: "Receiving Bank",
-        support: "Support",
-        help: "Help",
-        close: "Got it",
+        order_expired: "Order Expired!",
+        expired_desc: "Payment time has expired. For fund security, please restart the payment. The current QR code is invalid.",
+        refresh_btn: "Retry",
         contact_us: "Contact Us",
         help_guide: "Help Guide",
+        help: "Help",
         click_close: "Click to close",
-        help_img: "/assets/img/topup_hint_en.jpg?v=1.0",
-        merchant_ref: "Merchant Ref",
-        supported_banks_hint: "Use Bakong or a bank app that supports KHQR"
+        help_img: "/assets/img/topup_hint_en.jpg"
     },
     zh: {
         timer_hint: "请在规定时间内完成支付",
-        placeholder_title: "Bakong 支付",
-        placeholder_desc: "选择 Bakong 以显示 KHQR 付款码",
+        placeholder_title: "请选择支付银行",
+        placeholder_desc: "选择银行以显示付款二维码",
         instruction: "您可扫码支付，或复制账号手动转账",
         amount_label: "应付总额",
         amount_warning: "请确保金额一致，否则无法自动到账",
@@ -95,23 +93,26 @@ const I18N = {
         save_qr: "保存二维码到相册",
         save_hint: "* 保存后打开银行 App，选择该相册图片支付",
         assigning: "正在为您分配收款账号...",
-        no_bank_card: "暂无可用 Bakong 收款账号，请稍后重试",
+        no_bank_card: "该银行暂时无可用账号，请选择其他银行",
         net_err: "网络异常，请刷新后重试",
         order_no_label: "订单号",
         bank_label_row: "收款银行",
-        support: "客服支持",
-        help: "充值帮助",
-        close: "我知道了",
+        order_expired: "订单已超时!",
+        expired_desc: "付款时效已过期，为保障资金安全，请重新发起支付。当前二维码已失效。",
+        refresh_btn: "刷新重试",
         contact_us: "联系我们",
         help_guide: "帮助指引",
+        help: "充值帮助",
         click_close: "点击图片可收回",
-        help_img: "/assets/img/topup_hint_zh.jpg?v=1.0",
-        merchant_ref: "商户单号",
-        supported_banks_hint: "请使用 Bakong 或支持 KHQR 的银行 App 扫码支付"
+        help_img: "/assets/img/topup_hint_zh.jpg"
     }
 };
 
 const BANK_COLORS = {
+    'ABA': '#015B7D',
+    'WING': '#A9CB37',
+    'ACLEDA': '#143C6D',
+    'AC': '#143C6D',
     'BAKONG': '#ED1C24'
 };
 
@@ -140,16 +141,6 @@ window.setLanguage = function (lang) {
     // 同步写入 cookie 供直接输出超时的 php 页面读取，有效期 30 天
     document.cookie = "paybank_lang=" + lang + "; path=/; max-age=" + (30 * 24 * 60 * 60);
     updateInterface();
-}
-
-// 辅助函数：跨平台兼容打开新窗口 (V27.5)
-window.safeOpen = function (url) {
-    if (!url) return;
-    const win = window.open(url, '_blank');
-    if (!win || win.closed || typeof win.closed === 'undefined') {
-        // 如果被弹出窗口拦截器拦截，则在本窗口打开
-        window.location.href = url;
-    }
 }
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -186,9 +177,11 @@ function updateInterface() {
 function updateHintText(bankName) {
     const hintEl = document.getElementById('scan-hint-text');
     if (!hintEl) return;
-    // [V26.25.75] 跨行兼容性恢复：文案引导优化，明确支持所有 KHQR 银行
-    const text = I18N[currentLang]['recom_use'].replace('{{bank}}', 'Bakong / KHQR');
-    hintEl.innerHTML = `<i class="fa-solid fa-mobile-screen-button me-1"></i> ${text}`;
+    const cleanName = bankName.toUpperCase();
+    const key = (cleanName.includes("AC") || cleanName.includes("ACLEDA")) ? 'must_use' : 'recom_use';
+    let text = I18N[currentLang][key].replace('{{bank}}', cleanName);
+    const icon = key === 'must_use' ? 'fa-triangle-exclamation' : 'fa-mobile-screen-button';
+    hintEl.innerHTML = `<i class="fa-solid ${icon} me-1"></i> ${text}`;
 }
 
 function showToast(text) {
@@ -203,21 +196,81 @@ function showToast(text) {
     setTimeout(() => toast.classList.remove('show'), 1500);
 }
 
+// 辅助函数：跨平台兼容打开新窗口 (V27.5)
+window.safeOpen = function (url) {
+    if (!url) return;
+    const win = window.open(url, '_blank');
+    if (!win || win.closed || typeof win.closed === 'undefined') {
+        window.location.href = url;
+    }
+}
+
+window.togglePanel = function (panelId) {
+    const panels = ['contact-panel', 'help-panel'];
+    const overlay = document.getElementById('panel-overlay');
+    let anyOpen = false;
+
+    panels.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        
+        if (id === panelId) {
+            if (el.classList.contains('active')) {
+                el.classList.remove('active');
+                if (id === 'help-panel') document.getElementById('help-panel-tab')?.classList.remove('active');
+            } else {
+                el.classList.add('active');
+                if (id === 'help-panel') document.getElementById('help-panel-tab')?.classList.add('active');
+                anyOpen = true;
+            }
+        } else {
+            el.classList.remove('active');
+            if (id === 'help-panel') document.getElementById('help-panel-tab')?.classList.remove('active');
+        }
+    });
+
+    if (overlay) {
+        if (anyOpen) {
+            overlay.classList.add('show');
+            document.body.classList.add('panel-open');
+        } else {
+            overlay.classList.remove('show');
+            document.body.classList.remove('panel-open');
+        }
+    }
+}
+
+window.closeAllPanels = function () {
+    ['contact-panel', 'help-panel'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('active');
+    });
+    document.getElementById('help-panel-tab')?.classList.remove('active');
+    
+    const overlay = document.getElementById('panel-overlay');
+    if (overlay) {
+        overlay.classList.remove('show');
+    }
+    document.body.classList.remove('panel-open');
+}
+
 window.copyText = function (id, btn) {
     const el = document.getElementById(id);
     if (!el) return;
     const text = el.innerText.replace('$', '').trim();
     navigator.clipboard.writeText(text).then(() => {
         showToast(I18N[currentLang].copied || 'Copied!');
-        const targetBtn = btn || (event ? event.target : null);
-        if (targetBtn && targetBtn.tagName === 'BUTTON') {
-            const originalText = targetBtn.innerText;
-            targetBtn.innerText = I18N[currentLang].copied;
-            targetBtn.style.color = '#28a745';
+        if (btn && btn.tagName === 'BUTTON') {
+            const originalText = btn.innerText;
+            const originalBg = btn.style.backgroundColor;
+            btn.innerText = I18N[currentLang].copied;
+            btn.style.color = '#ffffff';
+            btn.style.backgroundColor = '#28a745';
             setTimeout(() => {
-                targetBtn.innerText = originalText;
-                targetBtn.style.color = '';
-            }, 2000);
+                btn.innerText = originalText;
+                btn.style.color = '';
+                btn.style.backgroundColor = originalBg;
+            }, 1000);
         }
     }).catch(err => console.error("Copy failed", err));
 };
@@ -228,7 +281,10 @@ function updateTimerVisuals(remainingSeconds) {
     const textEl = document.getElementById('timer-text');
 
     if (strokeEl) {
-        const offset = (remainingSeconds / (10 * 60)) * dashArray;
+        const config = document.getElementById('checkout-config').dataset;
+        // 尝试获取初始总时长，默认为 600
+        const total = parseInt(config.initialTotalSeconds || 600);
+        const offset = (remainingSeconds / total) * dashArray;
         strokeEl.setAttribute('stroke-dasharray', `${offset}, 100`);
     }
 
@@ -239,16 +295,17 @@ function updateTimerVisuals(remainingSeconds) {
     }
 }
 
-// window.selectBankAndStart moved down to maintain order
-
+window.selectBankAndStart = function (bankName) {
+    window.switchBank(bankName);
+}
 
 // 渐进式渲染引擎 2.0 (V6.0)：先显示基础码，后装饰增强
 window.renderQrCode = function (qrData, bankName) {
     const qrContainer = document.getElementById("qrcode");
     if (!qrContainer) return;
 
-    const cleanBankName = (bankName || 'Bakong').toUpperCase();
-    const bgColor = BANK_COLORS['BAKONG'] || '#ED1C24';
+    const cleanBankName = bankName.toUpperCase();
+    const bgColor = BANK_COLORS[cleanBankName] || '#015B7D';
 
     // A. 同步 UI 辅助信息 (V19.7：背景色换至保存按钮，使其更明显)
     const saveBtn = document.getElementById('save-qr-btn');
@@ -314,7 +371,11 @@ window.renderQrCode = function (qrData, bankName) {
         };
 
         const logo = new Image();
-        const logoPath = "assets/img/bank_logo/bakong_logo.png";
+        let logoPath = "";
+        if (cleanBankName.includes("ABA")) logoPath = "assets/img/bank_logo/aba_logo.png";
+        else if (cleanBankName.includes("WING")) logoPath = "assets/img/bank_logo/wing_logo.png";
+        else if (cleanBankName.includes("ACLEDA") || cleanBankName === "AC") logoPath = "assets/img/bank_logo/acleda_logo.png";
+        else if (cleanBankName.includes("BAKONG")) logoPath = "assets/img/bank_logo/bakong_logo.png";
 
         if (logoPath) {
             logo.src = logoPath;
@@ -345,8 +406,8 @@ window.renderQrCode = function (qrData, bankName) {
 };
 
 async function generateFancyCanvas(qrSource, bankName, orderNo) {
-    const cleanBankName = (bankName || 'Bakong').toUpperCase();
-    const bgColor = BANK_COLORS['BAKONG'] || '#ED1C24';
+    const cleanBankName = bankName.toUpperCase();
+    const bgColor = BANK_COLORS[cleanBankName] || '#015B7D';
 
     return new Promise((resolve) => {
         const canvas = document.createElement('canvas');
@@ -384,13 +445,17 @@ async function generateFancyCanvas(qrSource, bankName, orderNo) {
 
             ctx.fillStyle = bgColor;
             ctx.font = "bold 11px sans-serif";
-            ctx.fillText("Bakong KHQR", width / 2, height - 12);
+            ctx.fillText(cleanBankName + " KHQR", width / 2, height - 12);
 
             resolve(canvas.toDataURL("image/png"));
         };
 
         const logo = new Image();
-        const logoPath = "assets/img/bank_logo/bakong_logo.png";
+        let logoPath = "";
+        if (cleanBankName.includes("ABA")) logoPath = "assets/img/bank_logo/aba_logo.png";
+        else if (cleanBankName.includes("WING")) logoPath = "assets/img/bank_logo/wing_logo.png";
+        else if (cleanBankName.includes("ACLEDA") || cleanBankName === "AC") logoPath = "assets/img/bank_logo/acleda_logo.png";
+        else if (cleanBankName.includes("BAKONG")) logoPath = "assets/img/bank_logo/bakong_logo.png";
 
         if (logoPath) {
             logo.src = logoPath;
@@ -464,19 +529,13 @@ window.switchBank = async function (bankName, isPick = false) {
     if (infoArea) infoArea.classList.add('d-none');
 
     try {
-        const url = (isPick || config.checkoutMode === 'pick') ? 'api/assign_card.php' : 'api/switch_bank.php';
-
-        // 增加控制器以支持请求超时 (V27.6)
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒超时
-
+        const apiBase = (window.API_BASE || '').endsWith('/') ? window.API_BASE : (window.API_BASE ? window.API_BASE + '/' : '');
+        const url = (isPick || config.checkoutMode === 'pick') ? apiBase + 'api/assign_card.php' : apiBase + 'api/switch_bank.php';
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ order_no: config.orderNo, bank_name: bankName, token: currentToken }),
-            signal: controller.signal
+            body: JSON.stringify({ order_no: config.orderNo, bank_name: bankName, token: currentToken })
         });
-        clearTimeout(timeoutId);
         const res = await response.json();
         if (res.code === 200) {
             const data = res.data;
@@ -485,9 +544,10 @@ window.switchBank = async function (bankName, isPick = false) {
             document.getElementById('display-card-no').textContent = data.account_no || data.card_no;
 
             // 填充新字段 (V19.0)
-            const bankFullName = bankName.toUpperCase() === 'BAKONG' ? 'Bakong' : (bankName + ' Bank');
+            const bankFullName = (bankName.toUpperCase() === 'AC' || bankName.toUpperCase() === 'ACLEDA') ? 'ACLEDA Bank' : bankName.toUpperCase() + ' Bank';
             if (document.getElementById('display-bank-name')) document.getElementById('display-bank-name').textContent = bankFullName;
             if (document.getElementById('display-order-no')) {
+                const config = document.getElementById('checkout-config').dataset;
                 document.getElementById('display-order-no').textContent = config.orderNo;
             }
 
@@ -509,6 +569,11 @@ window.switchBank = async function (bankName, isPick = false) {
             updateInterface();
         } else {
             const msg = res.msg || I18N[currentLang].no_bank_card;
+            // 如果后端提示找不到订单（通常是由于已超时变状态），直接刷新页面触发 initPage 的超时判定
+            if (res.msg && res.msg.toLowerCase().includes('order not found')) {
+                window.location.reload();
+                return;
+            }
             placeholder.innerHTML = `<div class="p-4 text-center text-danger"><i class="fa-solid fa-triangle-exclamation fa-2x mb-2"></i><div>${msg}</div></div>`;
         }
     } catch (error) {
@@ -518,39 +583,57 @@ window.switchBank = async function (bankName, isPick = false) {
 };
 
 window.showExpiredState = function () {
-    // 根据用户覆盖回来的 PHP 代码，超时应直接触发刷新请求，交由 PHP 拦截展示全局纯英提示页
-    window.location.reload();
+    const glLoading = document.getElementById('page-loading');
+    if (glLoading) glLoading.style.display = 'none';
+
+    const mask = document.getElementById('expired-mask');
+    const container = document.querySelector('.checkout-container');
+    if (mask) mask.style.display = 'flex';
+    if (container) container.style.display = 'none';
+    if (typeof updateInterface === 'function') updateInterface();
 };
 
 document.addEventListener('DOMContentLoaded', function () {
     updateInterface();
     const configEl = document.getElementById('checkout-config');
-    if (configEl && configEl.dataset.remainingSeconds) {
-        let sec = parseInt(configEl.dataset.remainingSeconds);
+    let timerInterval = null;
 
+    window.startCountdown = function (remainingSeconds) {
+        if (timerInterval) clearInterval(timerInterval);
+
+        let sec = parseInt(remainingSeconds);
+        // [FIX] 如果时间已经是负数，或者 NaN，立即触发静默超时蒙版
         if (isNaN(sec) || sec <= 0) {
             window.showExpiredState();
-        } else {
-            const timerEl = document.getElementById('timer');
-            const expireTime = Date.now() + (sec * 1000);
-            const updateTimer = () => {
-                const diff = expireTime - Date.now();
-                if (diff <= 0) { window.showExpiredState(); return; }
-                const totalSeconds = Math.floor(diff / 1000);
-
-                // 同步圆环视觉 (V17)
-                updateTimerVisuals(totalSeconds);
-            };
-            setInterval(updateTimer, 1000);
-            updateTimer();
+            return;
         }
+
+        const expireTime = Date.now() + (sec * 1000);
+        const updateTimer = () => {
+            const diff = expireTime - Date.now();
+            if (diff <= 0) {
+                clearInterval(timerInterval);
+                window.showExpiredState();
+                return;
+            }
+            const totalSeconds = Math.floor(diff / 1000);
+            updateTimerVisuals(totalSeconds);
+        };
+
+        timerInterval = setInterval(updateTimer, 1000);
+        updateTimer();
+    };
+
+    if (configEl && configEl.dataset.orderNo && configEl.dataset.remainingSeconds && configEl.dataset.remainingSeconds !== '600') {
+        window.startCountdown(configEl.dataset.remainingSeconds);
     }
     // 状态轮询
     const statusPoller = setInterval(async () => {
         const configEl = document.getElementById('checkout-config');
         if (!configEl) return;
         try {
-            const res = await fetch(`api/check_order.php?order_no=${configEl.dataset.orderNo}&token=${currentToken}`);
+            const apiBase = (window.API_BASE || '').endsWith('/') ? window.API_BASE : (window.API_BASE ? window.API_BASE + '/' : '');
+            const res = await fetch(`${apiBase}api/check_order.php?order_no=${configEl.dataset.orderNo}&token=${currentToken}`);
             const json = await res.json();
             if (json.status === 'paid') {
                 clearInterval(statusPoller);
@@ -594,6 +677,3 @@ document.addEventListener('DOMContentLoaded', function () {
         } catch (e) { }
     }, 4000);
 });
-
-
-
