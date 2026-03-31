@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>PayBank Secure Checkout</title>
+    <title>PayBakong Secure Checkout</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/css/all.min.css" rel="stylesheet">
@@ -64,6 +64,35 @@
                 background-position: -200% 0;
             }
         }
+
+        .supported-banks-grid-compact {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 4px;
+            padding: 6px;
+            background: rgba(0, 0, 0, 0.012);
+            border-radius: 10px;
+            margin-top: 2px;
+            margin-bottom: 0px !important;
+        }
+
+        .bank-grid-item-mini {
+            background: white;
+            border-radius: 6px;
+            padding: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+            border: 1px solid #f0f0f0;
+            aspect-ratio: 1/1;
+        }
+
+        .bank-grid-item-mini img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
     </style>
 </head>
 
@@ -81,6 +110,17 @@
 
     <div class="checkout-container position-relative" style="opacity: 0; transition: opacity 0.3s ease;">
         <div class="payment-card shadow-lg">
+            <!-- [PERSISTENT BRANDING] 8 银行全量 LOGO 阵列，由 HTML 静态驱动，不随 API 报错消失 -->
+            <div class="supported-banks-grid-compact mt-2 mb-2">
+                <div class="bank-grid-item-mini"><img src="assets/img/allbank/Bakong.png" alt="Bakong"></div>
+                <div class="bank-grid-item-mini"><img src="assets/img/allbank/ABABank.png" alt="ABA"></div>
+                <div class="bank-grid-item-mini"><img src="assets/img/allbank/AcledaBank.png" alt="Acleda"></div>
+                <div class="bank-grid-item-mini"><img src="assets/img/allbank/WingBank.png" alt="Wing"></div>
+                <div class="bank-grid-item-mini"><img src="assets/img/allbank/CanadiaBank.png" alt="Canadia"></div>
+                <div class="bank-grid-item-mini"><img src="assets/img/allbank/Amret.png" alt="Amret"></div>
+                <div class="bank-grid-item-mini"><img src="assets/img/allbank/Pipay.png" alt="Pipay"></div>
+                <div class="bank-grid-item-mini"><img src="assets/img/allbank/TrueMoney.png" alt="TrueMoney"></div>
+            </div>
             <div class="bank-selector-wrapper mb-0">
                 <div class="d-flex justify-content-between align-items-center mb-0 p-1 position-relative">
                     <div class="lang-switcher" style="min-width: 80px;">
@@ -105,7 +145,12 @@
                     </div>
                 </div>
 
-                <div class="bank-pill-container" id="bank-pills-list">
+                <div class="text-muted small text-center mb-2" style="font-size: 11px; opacity: 0.8; margin-top: -8px;">
+                    <i class="fa-solid fa-circle-check me-1" style="color: #4CAF50;"></i> <span
+                        data-i18n="supported_banks_hint">Bakong / KHQR</span>
+                </div>
+
+                <div class="bank-pill-container d-none" id="bank-pills-list">
                     <div class="text-center w-100 p-3">
                         <div class="spinner-border spinner-border-sm text-primary"></div>
                     </div>
@@ -130,10 +175,9 @@
 
             <div class="selection-placeholder p-4 text-center" id="selection-placeholder">
                 <div class="icon-circle mb-3 mx-auto">
-                    <i class="fa-solid fa-hand-pointer fa-2x text-primary"></i>
+                    <div class="spinner-border text-primary"></div>
                 </div>
-                <h5 class="fw-bold mb-1" data-i18n="placeholder_title">请选择您的支付银行</h5>
-                <p class="text-muted small" data-i18n="placeholder_desc">请选择银行以显示付款码</p>
+                <h5 class="fw-bold mb-1" data-i18n="assigning">正在为您分配收款账号...</h5>
             </div>
 
             <div class="text-center mt-0 amount-warning-container">
@@ -216,7 +260,7 @@
                     </div>
                 </div>
                 <div class="drawer-content p-0">
-                    <img src="/assets/img/topup_hint_en.jpg" class="img-fluid help-img" alt="Help">
+                    <img src="assets/img/topup_hint_en.jpg" class="img-fluid help-img" alt="Help">
                 </div>
             </div>
         </div>
@@ -250,171 +294,9 @@
 
     <script src="assets/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/qrcode.min.js"></script>
-    <!-- 设置 API 基准地址，确保 checkout.js 中的请求发往后端域名 -->
+    <!-- [CONSOLIDATED V31.9] 设置 API 基准地址，由单主 JS (checkout.js) 驱动全流程 -->
     <script>window.API_BASE = 'https://bak.paybank8.com/';</script>
-    <script src="assets/js/checkout.js?v=31.9"></script>
-
-    <script>
-        // 利用 checkout.js 已定义的变量
-        // 冲突源修复：不再在 index.html 重新 const urlParams
-        const getUrlOrderNo = () => {
-            if (typeof urlParams !== 'undefined') {
-                return urlParams.get('order_no') || urlParams.get('trade_no');
-            }
-            const up = new URLSearchParams(window.location.search);
-            return up.get('order_no') || up.get('trade_no');
-        };
-
-        const getUrlToken = () => {
-            if (typeof currentToken !== 'undefined') return currentToken;
-            const up = new URLSearchParams(window.location.search);
-            return up.get('token');
-        };
-
-        async function initPage() {
-            const ono = getUrlOrderNo();
-            const tkn = getUrlToken();
-
-            if (!ono) {
-                console.error("Missing order_no");
-                const ph = document.getElementById('selection-placeholder');
-                if (ph) ph.innerHTML = '<div class="error-overlay"><h5>缺少订单号</h5><p>请通过正确的支付链接访问</p></div>';
-                return;
-            }
-
-            try {
-                const res = await fetch(`${window.API_BASE}api/get_order_details.php?order_no=${ono}&token=${tkn}`);
-                if (!res.ok) throw new Error('API request failed');
-                const json = await res.json();
-
-                // [FIX] 无论如何，只要 API 返回，立刻关掉 Loading 骨架并显示实际内容容器
-                const glLoading = document.getElementById('page-loading');
-                if (glLoading) glLoading.style.display = 'none';
-                document.querySelector('.checkout-container').style.opacity = '1';
-
-                if (json.code !== 200) {
-                    const ph = document.getElementById('selection-placeholder');
-                    if (ph) ph.innerHTML = `<div class="error-overlay"><h5>订单错误</h5><p>${json.msg}</p></div>`;
-                    return;
-                }
-
-                const data = json.data;
-                const config = document.getElementById('checkout-config').dataset;
-
-                // [CRITICAL] 超时处理逻辑
-                if (data.status === 'expired') {
-                    const mask = document.getElementById('expired-mask');
-                    if (mask) {
-                        mask.style.display = 'flex';
-                        document.querySelector('.checkout-container').style.display = 'none';
-                        if (typeof updateInterface === 'function') updateInterface();
-                    }
-                    return;
-                }
-
-                config.orderNo = data.order_no;
-                config.checkoutMode = data.checkout_mode; // [CRITICAL FIX] 同步模式
-                config.merchantOrderNo = data.out_order_no;
-
-                // [FIX] 修复 Safari/iOS 遇到 带横杠的字符串直接返回 `Invalid Date` 从而变成 NaN 导致直接弹超时的 Bug
-                const expStr = (data.expire_at || '').replace(/-/g, '/');
-                const srvStr = (data.server_time || '').replace(/-/g, '/');
-
-                const expireAt = new Date(expStr).getTime();
-                const now = new Date(srvStr).getTime();
-                const createdAt = new Date((data.created_at || '').replace(/-/g, '/')).getTime();
-
-                let remaining = Math.max(0, Math.floor((expireAt - now) / 1000));
-                const total = Math.max(remaining, (expireAt - createdAt) / 1000);
-
-                config.remainingSeconds = remaining;
-                config.initialTotalSeconds = total; // [NEW] 记录初始总秒数，用于进度条计算
-
-                document.getElementById('copy-amount').innerText = `$${parseFloat(data.real_amount).toFixed(2)}`;
-                document.getElementById('display-order-no').textContent = data.order_no;
-                document.getElementById('merchant-ref-display').textContent = data.out_order_no || 'N/A';
-
-                // [NEW] 处理侧边面板逻辑 (V28.6)
-                if (data.support_link) {
-                    const cp = document.getElementById('contact-panel');
-                    if (cp) {
-                        cp.classList.remove('d-none');
-                        const btn = document.getElementById('support-link-btn');
-                        if (btn) btn.onclick = () => window.safeOpen(data.support_link);
-                    }
-                }
-                if (parseInt(data.topup_hint) === 1) {
-                    document.getElementById('help-panel-tab')?.classList.remove('d-none');
-                }
-
-                renderBankPills(data.available_banks, data.bank_name);
-
-                if (data.bank_name && (data.khqr_string || data.qr_data)) {
-                    config.bankName = data.bank_name;
-                    applyLocalPaymentData(data);
-                }
-
-                // [CRITICAL FIX] 显式调用 checkout.js 中的重置倒计时逻辑，确保与服务器对齐
-                if (typeof window.startCountdown === 'function') {
-                    window.startCountdown(remaining);
-                }
-
-            } catch (err) {
-                console.error("Init Error:", err);
-                // 确保在网络异常时也关闭 Loading 并显示容器内容
-                const glLoading = document.getElementById('page-loading');
-                if (glLoading) glLoading.style.display = 'none';
-                document.querySelector('.checkout-container').style.opacity = '1';
-
-                const ph = document.getElementById('selection-placeholder');
-                if (ph) {
-                    ph.innerHTML = `
-                        <div class="error-overlay py-5">
-                            <i class="fa-solid fa-triangle-exclamation fa-3x mb-3 text-warning"></i>
-                            <h5 class="fw-bold">检测到连接异常</h5>
-                            <p class="text-muted small">无法加载订单数据，请检查网络后重试</p>
-                            <button class="btn btn-sm btn-outline-primary px-4 rounded-pill mt-2" onclick="window.location.reload()"><i class="fa-solid fa-rotate me-2"></i>点击重试</button>
-                        </div>`;
-                }
-            }
-        }
-
-        function renderBankPills(banks, activeName) {
-            const container = document.getElementById('bank-pills-list');
-            if (!container) return;
-            container.innerHTML = '';
-            if (!banks || banks.length === 0) return;
-
-            banks.forEach(b => {
-                const pill = document.createElement('div');
-                pill.className = `bank-pill ${b.name === activeName ? 'active' : ''}`;
-                pill.dataset.bank = b.name;
-                pill.onclick = () => window.switchBank(b.name); // 去掉强制 true
-
-                const iconName = b.name.toLowerCase() === 'ac' ? 'acleda' : b.name.toLowerCase();
-                // 优先由于本地路径寻找
-                pill.innerHTML = `<img src="assets/img/bank/${iconName}.jpg" class="bank-icon" onerror="this.onerror=null; this.src='${b.icon}';">`;
-                container.appendChild(pill);
-            });
-        }
-
-        function applyLocalPaymentData(data) {
-            document.getElementById('display-account-name').textContent = data.account_name || '--';
-            document.getElementById('display-card-no').textContent = data.account_no || data.card_no;
-            const bName = (data.bank_name.toUpperCase() === 'AC' || data.bank_name.toUpperCase() === 'ACLEDA') ? 'ACLEDA Bank' : data.bank_name.toUpperCase() + ' Bank';
-            document.getElementById('display-bank-name').textContent = bName;
-
-            document.getElementById('payment-info-area').classList.remove('d-none');
-            document.getElementById('qr-display-area').classList.remove('d-none');
-            document.getElementById('selection-placeholder').classList.add('d-none');
-            // 调用 checkout.js 中的 renderQrCode
-            if (typeof window.renderQrCode === 'function') {
-                window.renderQrCode(data.khqr_string || data.qr_data, data.bank_name);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', initPage);
-    </script>
+    <script src="assets/js/checkout.js?v=1.3"></script>
 </body>
 
 </html>
