@@ -162,20 +162,11 @@
                 </div>
             </div>
 
-    <!-- 支付成功遮罩层 (V44.0) -->
-    <div id="success-mask" style="display:none; position:fixed; inset:0; background:#ffffff; z-index:10000; flex-direction:column; align-items:center; justify-content:center; padding: 20px;">
-        <i class="fa-solid fa-circle-check text-success mb-4" style="font-size: 100px; color: #198754;"></i>
-        <h2 class="fw-bold mb-3" data-i18n="pay_success">支付成功!</h2>
-        <p class="text-muted text-center" id="success-hint">页面将在 <span id="close-sec" class="fw-bold text-dark">3</span> 秒内自动跳转...</p>
-        <button class="btn btn-primary px-5 py-2 rounded-pill mt-4" onclick="handleRedirection()" data-i18n="close_page">返回商户</button>
-    </div>
-
-    <!-- 配置容器 -->
-    <div id="checkout-config" data-khqr="" data-order-no="" data-amount="0.00" data-remaining-seconds="0" data-bank-name=""></div>
-
-        <div class="side-panel-container">
-            <div class="text-center mt-2 mb-2">
-                <small class="text-muted opacity-50" style="font-size: 0.6rem;"><span data-i18n="merchant_ref">Merchant Ref</span>: <span id="merchant-ref-display">N/A</span></small>
+            <!-- 商户单号：回归卡片最底部 (V45.2) -->
+            <div class="text-center mt-3 mb-1">
+                <small class="text-muted opacity-50" style="font-size: 0.63rem;">
+                    <span data-i18n="merchant_ref">Merchant Ref</span>: <span id="merchant-ref-display">N/A</span>
+                </small>
             </div>
         </div><!-- .payment-card END -->
 
@@ -187,6 +178,17 @@
                 </div>
             </div>
         </div>
+
+        <!-- 支付成功遮罩层 (V44.0) -->
+        <div id="success-mask" style="display:none; position:fixed; inset:0; background:#ffffff; z-index:10000; flex-direction:column; align-items:center; justify-content:center; padding: 20px;">
+            <i class="fa-solid fa-circle-check text-success mb-4" style="font-size: 100px; color: #198754;"></i>
+            <h2 class="fw-bold mb-3" data-i18n="pay_success">支付成功!</h2>
+            <p class="text-muted text-center" id="success-hint">页面将在 <span id="close-sec" class="fw-bold text-dark">3</span> 秒内自动跳转...</p>
+            <button class="btn btn-primary px-5 py-2 rounded-pill mt-4" onclick="handleRedirection()" data-i18n="close_page">返回商户</button>
+        </div>
+
+        <!-- 配置容器 -->
+        <div id="checkout-config" data-khqr="" data-order-no="" data-amount="0.00" data-remaining-seconds="0" data-bank-name=""></div>
 
         <div class="side-panel-container">
             <div class="side-panel-wrapper left d-none" id="contact-panel">
