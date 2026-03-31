@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>PayBakong Secure Checkout</title>
+    <title>PayBank Secure Checkout</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/css/all.min.css" rel="stylesheet">
@@ -64,35 +64,6 @@
                 background-position: -200% 0;
             }
         }
-
-        .supported-banks-grid-compact {
-            display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            gap: 4px;
-            padding: 6px;
-            background: rgba(0, 0, 0, 0.012);
-            border-radius: 10px;
-            margin-top: 2px;
-            margin-bottom: 0px !important;
-        }
-
-        .bank-grid-item-mini {
-            background: white;
-            border-radius: 6px;
-            padding: 3px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-            border: 1px solid #f0f0f0;
-            aspect-ratio: 1/1;
-        }
-
-        .bank-grid-item-mini img {
-            max-width: 90%;
-            max-height: 90%;
-            object-fit: contain;
-        }
     </style>
 </head>
 
@@ -132,22 +103,6 @@
                             <text x="18" y="21" class="percentage" id="timer-text">--:--</text>
                         </svg>
                     </div>
-                </div>
-
-                <!-- 银行图标展示网格 (V3.3 全量银行图标恢复) -->
-                <div class="supported-banks-grid-compact mb-1">
-                    <div class="bank-grid-item-mini"><img src="assets/img/allbank/Bakong.png" alt="Bakong"></div>
-                    <div class="bank-grid-item-mini"><img src="assets/img/allbank/ABABank.png" alt="ABA"></div>
-                    <div class="bank-grid-item-mini"><img src="assets/img/allbank/AcledaBank.png" alt="Acleda"></div>
-                    <div class="bank-grid-item-mini"><img src="assets/img/allbank/WingBank.png" alt="Wing"></div>
-                    <div class="bank-grid-item-mini"><img src="assets/img/allbank/CanadiaBank.png" alt="Canadia"></div>
-                    <div class="bank-grid-item-mini"><img src="assets/img/allbank/Amret.png" alt="Amret"></div>
-                    <div class="bank-grid-item-mini"><img src="assets/img/allbank/Pipay.png" alt="Pipay"></div>
-                    <div class="bank-grid-item-mini"><img src="assets/img/allbank/TrueMoney.png" alt="TrueMoney"></div>
-                </div>
-                <div class="text-muted small text-center mb-2" style="font-size: 11px; opacity: 0.8; margin-top: -8px;">
-                    <i class="fa-solid fa-circle-check me-1" style="color: #4CAF50;"></i> <span
-                        data-i18n="supported_banks_hint">Bakong / KHQR</span>
                 </div>
 
                 <div class="bank-pill-container" id="bank-pills-list">
@@ -296,7 +251,7 @@
     <script src="assets/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/qrcode.min.js"></script>
     <!-- 设置 API 基准地址，确保 checkout.js 中的请求发往后端域名 -->
-    <script>window.API_BASE = 'https://bak.paybank8.com/';</script>
+    <script>window.API_BASE = 'https://kh.paybank8.com/';</script>
     <script src="assets/js/checkout.js?v=31.9"></script>
 
     <script>
