@@ -29,11 +29,21 @@ export async function onRequest(context) {
     try {
         res = await fetch(target, init);
     } catch (e) {
+        // [V31.9 DEBUG] 增加更详细的错误返回，帮助定位源站连接问题
         return new Response(
-            JSON.stringify({ code: 502, msg: '上游 API 不可达', detail: String(e && e.message ? e.message : e) }),
+            JSON.stringify({ 
+                code: 502, 
+                msg: 'Target Unreachable', 
+                target: target,
+                env_origin: env.CHECKOUT_API_ORIGIN || 'DEFAULT',
+                error: String(e && e.message ? e.message : e) 
+            }),
             {
                 status: 502,
-                headers: { 'Content-Type': 'application/json; charset=utf-8' },
+                headers: { 
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'Access-Control-Allow-Origin': '*'
+                },
             }
         );
     }
@@ -41,7 +51,11 @@ export async function onRequest(context) {
     const out = new Headers();
     const ct = res.headers.get('Content-Type');
     if (ct) out.set('Content-Type', ct);
+    
+    // 强制允许跨域，确保 Pages 域名能收到响应
     out.set('Access-Control-Allow-Origin', '*');
+    out.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     out.set('Cross-Origin-Resource-Policy', 'cross-origin');
+    
     return new Response(res.body, { status: res.status, headers: out });
 }
