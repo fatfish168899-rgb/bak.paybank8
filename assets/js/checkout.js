@@ -678,21 +678,29 @@ async function initPage() {
     }
 
     try {
-        const detailsUrl = checkoutApiGetUrl('api/get_order_details.php', { order_no: ono, token: tkn });
-        console.log("[V34 Debug] Attempting Fetch:", detailsUrl);
+        let detailsUrl = checkoutApiGetUrl('api/get_order_details.php', { order_no: ono, token: tkn });
+        console.log("[PB-SYSTEM] Initial Fetch Path:", detailsUrl);
         
         let res;
         try {
             res = await fetch(detailsUrl, { cache: 'no-cache' });
-        } catch (fetchErr) {
-            console.warn("[V34 Debug] First attempt failed, retrying...", fetchErr);
-            // 自动重试一次
-            res = await fetch(detailsUrl, { cache: 'no-store' });
+        } catch (e) {
+            console.warn("[PB-SYSTEM] Local Proxy Failed (NetworkError). Attempting Direct-Hit Fallback...", e);
+            // [V35.1 HYBRID FALLBACK] 核心逻辑：如果本地转发不通，直接请求源站接口
+            const upstream = (window.CHECKOUT_UPSTREAM_ORIGIN || 'https://bak.paybank8.com');
+            const fallbackBase = upstream.endsWith('/') ? upstream : (upstream + '/');
+            const fallbackUrl = new URL('api/get_order_details.php', fallbackBase);
+            fallbackUrl.searchParams.set('order_no', ono);
+            fallbackUrl.searchParams.set('token', tkn);
+            fallbackUrl.searchParams.set('mode', 'fallback');
+            
+            console.log("[PB-SYSTEM] Final Fallback URL:", fallbackUrl.toString());
+            res = await fetch(fallbackUrl.toString(), { mode: 'cors', cache: 'no-store' });
         }
 
-        if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
-        console.log("[V34 Debug] Success JSON:", json);
+        console.log("[PB-SYSTEM] Data Loaded:", json.code);
 
         const glLoading = document.getElementById('page-loading');
         if (glLoading) glLoading.style.display = 'none';
