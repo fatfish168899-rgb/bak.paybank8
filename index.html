@@ -73,6 +73,10 @@
                 </div>
             </div>
 
+            <div class="bank-pill-container mb-3" id="bank-pills-list">
+                <!-- 由 JS 动态生成 -->
+            </div>
+
             <div class="qr-area d-none" id="qr-display-area">
                 <div id="qrcode" class="mx-auto"></div>
                 <div class="qr-action-group">  
@@ -87,7 +91,7 @@
                 </div>
             </div>
 
-            <div class="selection-placeholder p-4 text-center" id="selection-placeholder">
+            <div class="selection-placeholder p-4 text-center d-none" id="selection-placeholder">
                 <div class="spinner-border text-primary mb-3"></div>
                 <h5 class="fw-bold mb-1" data-i18n="assigning">正在分配收款账号...</h5>
             </div>
@@ -166,7 +170,7 @@
     <script src="assets/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/qrcode.min.js"></script>
     <script>window.API_BASE = 'https://bak.paybank8.com/';</script>
-    <script src="assets/js/checkout.js?v=40.0"></script>
+    <script src="assets/js/checkout.js?v=41.0"></script>
 
     <script>
     async function initPage() {
@@ -180,31 +184,26 @@
             const res = await fetch(`${window.API_BASE}api/get_order_details.php?order_no=${ono}&token=${tkn}`);
             const json = await res.json();
 
-            // 无论成功失败，隐藏全屏 Loading
             document.getElementById('page-loading').style.display = 'none';
             document.querySelector('.checkout-container').style.opacity = '1';
 
             if (json.code !== 200 || json.data.status === 'expired') {
-                window.location.reload(); // PHP 端会自动处理超时显示
+                window.location.reload(); 
                 return;
             }
 
             const data = json.data;
             const config = document.getElementById('checkout-config').dataset;
 
-            // 填充数据
             config.orderNo = data.order_no;
             config.remainingSeconds = data.remaining_seconds || 600;
-            config.bankName = data.bank_name || 'Bakong';
+            config.bankName = data.bank_name || '';
             
             document.getElementById('copy-amount').innerText = `$${parseFloat(data.real_amount).toFixed(2)}`;
             document.getElementById('display-order-no').textContent = data.order_no;
             document.getElementById('merchant-ref-display').textContent = data.out_order_no || 'N/A';
-            document.getElementById('display-account-name').textContent = data.account_name || '--';
-            document.getElementById('display-card-no').textContent = data.account_no || data.card_no;
-            document.getElementById('display-bank-name').textContent = config.bankName;
 
-            // 处理侧边栏
+            // 拉取侧边栏配置
             if (data.support_link) {
                 document.getElementById('contact-panel').classList.remove('d-none');
                 document.getElementById('support-link-btn').onclick = () => window.safeOpen(data.support_link);
@@ -213,22 +212,78 @@
                 document.getElementById('help-panel-tab')?.classList.remove('d-none');
             }
 
-            // 渲染 QR
-            if (data.khqr_string || data.qr_data) {
-                document.getElementById('selection-placeholder').classList.add('d-none');
-                document.getElementById('qr-display-area').classList.remove('d-none');
-                document.getElementById('payment-info-area').classList.remove('d-none');
-                window.renderQrCode(data.khqr_string || data.qr_data, config.bankName);
-            } else if (data.bank_name) {
-                // 如果有银行但没码，触发一次 switch
-                window.switchBank(data.bank_name);
+            // 渲染银行选择器
+            renderBankPills(data.available_banks, data.bank_name);
+
+            // 如果已有银行卡信息
+            if (data.bank_name && (data.khqr_string || data.qr_data)) {
+                applyPaymentData(data);
+            }
+
+            // 启动倒计时
+            if (window.updateTimerVisuals) {
+                 const total = 600;
+                 const timer = setInterval(() => {
+                    config.remainingSeconds--;
+                    if (config.remainingSeconds <= 0) { clearInterval(timer); window.location.reload(); }
+                    window.updateTimerVisuals(config.remainingSeconds);
+                 }, 1000);
             }
 
         } catch (e) {
-            console.error(e);
-            window.location.reload();
+            console.error("Fetch Error:", e);
+            document.getElementById('page-loading').style.display = 'none';
+            document.querySelector('.checkout-container').style.opacity = '1';
+            
+            const ph = document.getElementById('selection-placeholder');
+            if (ph) {
+                ph.classList.remove('d-none');
+                ph.innerHTML = `
+                    <div class="py-5">
+                        <i class="fa-solid fa-triangle-exclamation fa-3x text-warning mb-3"></i>
+                        <h5 class="fw-bold">网络连接异常</h5>
+                        <p class="text-muted small">无法从源站获取订单数据，请检查网络或更换浏览器</p>
+                        <button class="btn btn-primary rounded-pill px-4" onclick="window.location.reload()">手动重试</button>
+                    </div>
+                `;
+            }
         }
     }
+
+    function renderBankPills(banks, activeBank) {
+        const container = document.getElementById('bank-pills-list');
+        if (!container || !banks) return;
+        container.innerHTML = '';
+        banks.forEach(bank => {
+            const pill = document.createElement('div');
+            pill.className = `bank-pill ${bank === activeBank ? 'active' : ''}`;
+            pill.dataset.bank = bank;
+            pill.onclick = () => window.switchBank(bank);
+            
+            const img = document.createElement('img');
+            img.className = 'bank-icon';
+            img.src = `assets/img/bank/${bank.toLowerCase()}.png`;
+            img.onerror = () => { img.src = `assets/img/bank/${bank.toLowerCase()}.jpg`; };
+            
+            pill.appendChild(img);
+            container.appendChild(pill);
+        });
+    }
+
+    function applyPaymentData(data) {
+        document.getElementById('selection-placeholder').classList.add('d-none');
+        document.getElementById('qr-display-area').classList.remove('d-none');
+        document.getElementById('payment-info-area').classList.remove('d-none');
+        
+        document.getElementById('display-account-name').textContent = data.account_name || '--';
+        document.getElementById('display-card-no').textContent = data.account_no || data.card_no;
+        document.getElementById('display-bank-name').textContent = data.bank_name;
+
+        if (window.renderQrCode) {
+            window.renderQrCode(data.khqr_string || data.qr_data, data.bank_name);
+        }
+    }
+
 
     function togglePanel(panelId) {
         const el = document.getElementById(panelId);
