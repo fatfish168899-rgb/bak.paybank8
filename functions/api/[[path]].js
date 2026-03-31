@@ -4,6 +4,20 @@
  */
 export async function onRequest(context) {
     const { request, env, params } = context;
+    
+    // [V32.0] 优先处理 OPTIONS 预检请求，防止浏览器挂起
+    if (request.method === 'OPTIONS') {
+        return new Response(null, {
+            status: 204,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type, Accept',
+                'Access-Control-Max-Age': '86400',
+            }
+        });
+    }
+
     const raw = params.path;
     const path = Array.isArray(raw) ? raw.join('/') : (raw || '');
     const upstream = String(env.CHECKOUT_API_ORIGIN || 'https://bak.paybank8.com').replace(/\/$/, '');
@@ -15,7 +29,7 @@ export async function onRequest(context) {
         redirect: 'follow',
         headers: {
             'Accept': request.headers.get('Accept') || 'application/json',
-            'User-Agent': request.headers.get('User-Agent') || 'PayBankCheckout-Proxy/1',
+            'User-Agent': request.headers.get('User-Agent') || 'PayBankCheckout-Proxy/32',
         },
     };
 
@@ -29,33 +43,24 @@ export async function onRequest(context) {
     try {
         res = await fetch(target, init);
     } catch (e) {
-        // [V31.9 DEBUG] 增加更详细的错误返回，帮助定位源站连接问题
         return new Response(
-            JSON.stringify({ 
-                code: 502, 
-                msg: 'Target Unreachable', 
-                target: target,
-                env_origin: env.CHECKOUT_API_ORIGIN || 'DEFAULT',
-                error: String(e && e.message ? e.message : e) 
-            }),
+            JSON.stringify({ code: 502, msg: 'Upstream Unreachable', detail: String(e) }),
             {
                 status: 502,
-                headers: { 
-                    'Content-Type': 'application/json; charset=utf-8',
-                    'Access-Control-Allow-Origin': '*'
-                },
+                headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
             }
         );
     }
 
-    const out = new Headers();
-    const ct = res.headers.get('Content-Type');
-    if (ct) out.set('Content-Type', ct);
+    // [V32.0 重要修复] 使用 arrayBuffer 转存结果而非直接流式转发，防止 pending 挂起
+    const body = await res.arrayBuffer();
+    const outHeaders = new Headers(res.headers);
+    outHeaders.set('Access-Control-Allow-Origin', '*');
+    outHeaders.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    outHeaders.set('Cross-Origin-Resource-Policy', 'cross-origin');
     
-    // 强制允许跨域，确保 Pages 域名能收到响应
-    out.set('Access-Control-Allow-Origin', '*');
-    out.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    out.set('Cross-Origin-Resource-Policy', 'cross-origin');
-    
-    return new Response(res.body, { status: res.status, headers: out });
+    return new Response(body, {
+        status: res.status,
+        headers: outHeaders
+    });
 }
