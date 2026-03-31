@@ -318,17 +318,22 @@
       Cloudflare Pages：API_BASE = 当前域名，由 functions/api 转发；localhost 无 vhost 时仍直连下方默认上游。
     -->
     <script>
-        // [V33.0 INDUSTRIAL FIX]
+        // [V34.0 HYPER-DIAGNOSTIC]
         window.CHECKOUT_UPSTREAM_ORIGIN = 'https://bak.paybank8.com';
-        (function () {
-            var isFile = location.protocol === 'file:';
-            // 最终修复：必须提供绝对路径作为 URL 构造函数的 Base
-            window.API_BASE = isFile ? (window.CHECKOUT_UPSTREAM_ORIGIN + '/') : (window.location.origin + '/');
-            console.log("[PB-SYSTEM] Runtime Protocol:", location.protocol);
-            console.log("[PB-SYSTEM] Configured API Base:", window.API_BASE);
+        (function() {
+            var protocol = location.protocol;
+            var isFile = protocol === 'file:';
+            // 尝试强制使用绝对路径解决 NetworkError
+            window.API_BASE = isFile ? (window.CHECKOUT_UPSTREAM_ORIGIN + '/') : (location.origin + '/');
+            
+            console.warn("--- [PAYBANK DEBUG START] ---");
+            console.log("Protocol:", protocol);
+            console.log("Current Origin:", location.origin);
+            console.log("Final API_BASE:", window.API_BASE);
+            console.warn("--- [PAYBANK DEBUG END] ---");
         })();
     </script>
-    <script src="assets/js/checkout.js?v=33.2"></script>
+    <script src="assets/js/checkout.js?v=34.0"></script>
 </body>
 
 </html>
