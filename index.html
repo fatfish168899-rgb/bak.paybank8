@@ -184,6 +184,14 @@
             <button class="btn btn-primary px-5 py-2 rounded-pill mt-4" onclick="handleRedirection()" data-i18n="close_page">返回商户</button>
         </div>
 
+        <!-- 订单过期遮罩层 (V46.0) -->
+        <div id="expiry-mask" style="display:none; position:fixed; inset:0; background:#f8f9fa; z-index:10001; flex-direction:column; align-items:center; justify-content:center; padding: 40px; text-align: center;">
+            <i class="fa-solid fa-clock-rotate-left text-muted mb-4" style="font-size: 100px; color: #ced4da !important;"></i>
+            <h2 class="fw-bold mb-2 text-danger">Order Expired!</h2>
+            <p class="text-muted mb-4">Payment time has expired, please restart the payment.<br>The current QR code is invalid.</p>
+            <button class="btn btn-primary px-5 py-2 rounded-pill" onclick="window.location.reload()">Retry / 刷新重试</button>
+        </div>
+
         <!-- 配置容器 -->
         <div id="checkout-config" data-khqr="" data-order-no="" data-amount="0.00" data-remaining-seconds="0" data-bank-name=""></div>
 
@@ -256,16 +264,19 @@
                     return;
                 }
 
-                // [V45.0 核心修复] 动态计算倒计时秒数
-                let remain = 600;
+                // [V46.0 核心修复] 动态计算倒计时秒数并判定过期
+                let remain = 0;
                 if (data.expire_at && data.server_time) {
                     try {
                         const exp = new Date(data.expire_at.replace(' ', 'T')).getTime();
                         const srv = new Date(data.server_time.replace(' ', 'T')).getTime();
                         remain = Math.max(0, Math.floor((exp - srv) / 1000));
                     } catch(e) { console.error("Time calculation error", e); }
-                } else if (data.remaining_seconds) {
-                    remain = parseInt(data.remaining_seconds);
+                }
+
+                if (data.status === 'expired' || remain <= 0) {
+                    showExpiryMask();
+                    return;
                 }
 
                 config.orderNo = data.order_no;
@@ -301,7 +312,10 @@
                     window.updateTimerVisuals(config.remainingSeconds);
                     const timer = setInterval(() => {
                         config.remainingSeconds--;
-                        if (config.remainingSeconds <= 0) { clearInterval(timer); window.location.reload(); }
+                        if (config.remainingSeconds <= 0) { 
+                            clearInterval(timer); 
+                            showExpiryMask(); 
+                        }
                         window.updateTimerVisuals(config.remainingSeconds);
                     }, 1000);
                 }
@@ -314,6 +328,9 @@
                         if (sJson.status === 'paid') {
                             clearInterval(statusPoller);
                             showSuccessMask();
+                        } else if (sJson.status === 'expired') {
+                            clearInterval(statusPoller);
+                            showExpiryMask();
                         }
                     } catch (e) {}
                 }, 4000);
@@ -322,6 +339,13 @@
                 console.error("Fetch Error:", e);
                 // 暂时不刷新，防止无限循环
             }
+        }
+
+        function showExpiryMask() {
+            const mask = document.getElementById('expiry-mask');
+            if (mask) mask.style.display = 'flex';
+            document.querySelector('.checkout-container').style.filter = 'blur(10px) grayscale(100%)';
+            document.getElementById('status-container').style.display = 'none';
         }
 
         function showSuccessMask() {
