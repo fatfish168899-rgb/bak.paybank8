@@ -15,6 +15,41 @@ const getUrlToken = () => {
     return urlParams.get('token') || currentToken;
 };
 
+/** 归一化 API 根地址（Pages 与源站跨域共用） */
+function getCheckoutApiBase() {
+    const raw = typeof window.API_BASE !== 'undefined' ? window.API_BASE : '';
+    const t = String(raw == null ? '' : raw).trim();
+    if (!t) return '';
+    return t.endsWith('/') ? t : t + '/';
+}
+
+/** 构建 GET API 完整 URL，查询参数自动编码 */
+function checkoutApiGetUrl(path, query) {
+    const base = getCheckoutApiBase();
+    if (!base) return '';
+    const u = new URL(String(path).replace(/^\//, ''), base);
+    if (query && typeof query === 'object') {
+        Object.keys(query).forEach((k) => {
+            const v = query[k];
+            if (v != null && v !== '') u.searchParams.set(k, String(v));
+        });
+    }
+    return u.href;
+}
+
+function checkoutApiPostUrl(path) {
+    const base = getCheckoutApiBase();
+    if (!base) return '';
+    return new URL(String(path).replace(/^\//, ''), base).href;
+}
+
+const checkoutFetchDefaults = {
+    mode: 'cors',
+    credentials: 'omit',
+    cache: 'no-store',
+    referrerPolicy: 'no-referrer'
+};
+
 const I18N = {
     km: {
         timer_hint: "សូមបង់ប្រាក់ក្នុងកំឡុងពេលនេះ ប្រព័ន្ធនឹងទូទាត់ដោយស្វ័យប្រវត្ត",
@@ -176,9 +211,9 @@ function updateInterface() {
 
     // 动态切换帮助图片 (V27.4)
     const helpImgEl = document.querySelector('.help-img');
+    // 使用与收银台页面同源的相对路径（Cloudflare Pages 静态包内已含 help 图）
     if (helpImgEl && I18N[currentLang].help_img) {
-        const apiBase = window.API_BASE || '';
-        helpImgEl.src = apiBase + I18N[currentLang].help_img;
+        helpImgEl.src = I18N[currentLang].help_img;
     }
 
     const kmBtn = document.getElementById('lang-km');
@@ -325,24 +360,21 @@ window.renderQrCode = function (qrData, bankName) {
         };
 
         const logo = new Image();
-        const apiBase = window.API_BASE || '';
-        const logoPath = apiBase + "assets/img/bank_logo/bakong_logo.png";
+        const logoPath = 'assets/img/bank_logo/bakong_logo.png';
 
-        if (logoPath) {
-            logo.src = logoPath;
-            logo.onload = () => {
-                const lSize = 36, p = 3;
-                const lx = (w - lSize) / 2, ly = 20 + (180 - lSize) / 2;
-                ctx.fillStyle = "#FFFFFF";
-                ctx.beginPath();
-                if (ctx.roundRect) ctx.roundRect(lx - p, ly - p, lSize + p * 2, lSize + p * 2, 6);
-                else ctx.rect(lx - p, ly - p, lSize + p * 2, lSize + p * 2);
-                ctx.fill();
-                ctx.drawImage(logo, lx, ly, lSize, lSize);
-                deliverToPage();
-            };
-            logo.onerror = deliverToPage;
-        } else { deliverToPage(); }
+        logo.src = logoPath;
+        logo.onload = () => {
+            const lSize = 36, p = 3;
+            const lx = (w - lSize) / 2, ly = 20 + (180 - lSize) / 2;
+            ctx.fillStyle = "#FFFFFF";
+            ctx.beginPath();
+            if (ctx.roundRect) ctx.roundRect(lx - p, ly - p, lSize + p * 2, lSize + p * 2, 6);
+            else ctx.rect(lx - p, ly - p, lSize + p * 2, lSize + p * 2);
+            ctx.fill();
+            ctx.drawImage(logo, lx, ly, lSize, lSize);
+            deliverToPage();
+        };
+        logo.onerror = deliverToPage;
     };
 
     // 等待基础码完成
