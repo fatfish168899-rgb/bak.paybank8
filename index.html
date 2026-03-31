@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="km">
+
 <head>
     <meta charset="UTF-8">
     <title>PayBakong Secure Checkout</title>
@@ -13,27 +14,43 @@
             grid-template-columns: repeat(8, 1fr);
             gap: 4px;
             padding: 6px;
-            background: rgba(0,0,0,0.012);
+            background: rgba(0, 0, 0, 0.012);
             border-radius: 10px;
             margin-top: 2px;
             margin-bottom: 0px !important;
         }
+
         .bank-grid-item-mini {
-            background: white; border-radius: 6px; padding: 3px; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.03); border: 1px solid #f0f0f0; aspect-ratio: 1/1;
+            background: white;
+            border-radius: 6px;
+            padding: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+            border: 1px solid #f0f0f0;
+            aspect-ratio: 1/1;
         }
-        .bank-grid-item-mini img { max-width: 90%; max-height: 90%; object-fit: contain; }
+
+        .bank-grid-item-mini img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
     </style>
 </head>
+
 <body>
     <!-- 极简加载层 -->
-    <div id="page-loading" style="position:fixed; inset:0; background:#f8f9fa; z-index:10000; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+    <div id="page-loading"
+        style="position:fixed; inset:0; background:#f8f9fa; z-index:10000; display:flex; flex-direction:column; align-items:center; justify-content:center;">
         <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;"></div>
         <div class="mt-3 text-muted small fw-bold">Loading Secure Checkout...</div>
     </div>
 
     <!-- 配置容器：由 JS 在获取 API 后填充 -->
-    <div id="checkout-config" data-khqr="" data-order-no="" data-amount="0.00" data-remaining-seconds="0" data-bank-name=""></div>
+    <div id="checkout-config" data-khqr="" data-order-no="" data-amount="0.00" data-remaining-seconds="0"
+        data-bank-name=""></div>
 
     <div class="checkout-container position-relative m-0 p-0" style="opacity:0; transition: opacity 0.4s;">
         <div class="payment-card shadow-lg">
@@ -47,29 +64,41 @@
                         <span class="lang-btn" onclick="setLanguage('zh')" id="lang-zh">ZH</span>
                     </div>
                     <div class="flex-grow-1 text-center">
-                        <small class="text-danger fw-bold" style="font-size: 0.72rem;" data-i18n="timer_hint">请在规定时间内完成支付</small>
+                        <small class="text-danger fw-bold" style="font-size: 0.72rem;"
+                            data-i18n="timer_hint">请在规定时间内完成支付</small>
                     </div>
                     <div class="circular-timer d-flex justify-content-end">
                         <svg viewBox="0 0 36 36" class="circular-chart text-danger">
-                            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                            <path class="circle" id="timer-stroke" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path class="circle-bg"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path class="circle" id="timer-stroke" stroke-dasharray="100, 100"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                             <text x="18" y="21" class="percentage" id="timer-text">--:--</text>
                         </svg>
                     </div>
                 </div>
 
                 <div class="supported-banks-grid-compact mb-1">
-                    <div class="bank-grid-item-mini"><img src="assets/img/allbank/Bakong.png" onerror="this.src='/assets/img/allbank/Bakong.png'"></div>
-                    <div class="bank-grid-item-mini"><img src="assets/img/allbank/ABABank.png" onerror="this.src='/assets/img/allbank/ABABank.png'"></div>
-                    <div class="bank-grid-item-mini"><img src="assets/img/allbank/AcledaBank.png" onerror="this.src='/assets/img/allbank/AcledaBank.png'"></div>
-                    <div class="bank-grid-item-mini"><img src="assets/img/allbank/WingBank.png" onerror="this.src='/assets/img/allbank/WingBank.png'"></div>
-                    <div class="bank-grid-item-mini"><img src="assets/img/allbank/CanadiaBank.png" onerror="this.src='/assets/img/allbank/CanadiaBank.png'"></div>
-                    <div class="bank-grid-item-mini"><img src="assets/img/allbank/Amret.png" onerror="this.src='/assets/img/allbank/Amret.png'"></div>
-                    <div class="bank-grid-item-mini"><img src="assets/img/allbank/Pipay.png" onerror="this.src='/assets/img/allbank/Pipay.png'"></div>
-                    <div class="bank-grid-item-mini"><img src="assets/img/allbank/TrueMoney.png" onerror="this.src='/assets/img/allbank/TrueMoney.png'"></div>
+                    <div class="bank-grid-item-mini"><img src="assets/img/allbank/Bakong.png"
+                            onerror="this.src='/assets/img/allbank/Bakong.png'"></div>
+                    <div class="bank-grid-item-mini"><img src="assets/img/allbank/ABABank.png"
+                            onerror="this.src='/assets/img/allbank/ABABank.png'"></div>
+                    <div class="bank-grid-item-mini"><img src="assets/img/allbank/AcledaBank.png"
+                            onerror="this.src='/assets/img/allbank/AcledaBank.png'"></div>
+                    <div class="bank-grid-item-mini"><img src="assets/img/allbank/WingBank.png"
+                            onerror="this.src='/assets/img/allbank/WingBank.png'"></div>
+                    <div class="bank-grid-item-mini"><img src="assets/img/allbank/CanadiaBank.png"
+                            onerror="this.src='/assets/img/allbank/CanadiaBank.png'"></div>
+                    <div class="bank-grid-item-mini"><img src="assets/img/allbank/Amret.png"
+                            onerror="this.src='/assets/img/allbank/Amret.png'"></div>
+                    <div class="bank-grid-item-mini"><img src="assets/img/allbank/Pipay.png"
+                            onerror="this.src='/assets/img/allbank/Pipay.png'"></div>
+                    <div class="bank-grid-item-mini"><img src="assets/img/allbank/TrueMoney.png"
+                            onerror="this.src='/assets/img/allbank/TrueMoney.png'"></div>
                 </div>
                 <div class="text-muted small text-center mb-2" style="font-size: 11px; opacity: 0.8; margin-top: -8px;">
-                    <i class="fa-solid fa-circle-check me-1" style="color: #4CAF50;"></i> <span data-i18n="supported_banks_hint">Bakong / KHQR</span>
+                    <i class="fa-solid fa-circle-check me-1" style="color: #4CAF50;"></i> <span
+                        data-i18n="supported_banks_hint">Bakong / KHQR</span>
                 </div>
             </div>
 
@@ -77,7 +106,7 @@
 
             <div class="qr-area d-none" id="qr-display-area">
                 <div id="qrcode" class="mx-auto"></div>
-                <div class="qr-action-group">  
+                <div class="qr-action-group">
                     <button class="qr-save-btn" onclick="saveQrCode()" id="save-qr-btn">
                         <i class="fa-solid fa-download me-1"></i>
                         <span data-i18n="save_qr">保存二维码到相册</span>
@@ -104,34 +133,47 @@
 
             <div class="order-details-card d-none" id="payment-info-area">
                 <div class="detail-row">
-                    <span class="detail-label"><i class="fa-solid fa-credit-card me-1 opacity-75"></i><span data-i18n="card_label">收款账户</span></span>
-                    <div class="detail-content"><span class="detail-value font-monospace" id="display-card-no">------</span><button class="mini-copy-btn" onclick="copyText('display-card-no', this)" data-i18n="copy">复制</button></div>
+                    <span class="detail-label"><i class="fa-solid fa-credit-card me-1 opacity-75"></i><span
+                            data-i18n="card_label">收款账户</span></span>
+                    <div class="detail-content"><span class="detail-value font-monospace"
+                            id="display-card-no">------</span><button class="mini-copy-btn"
+                            onclick="copyText('display-card-no', this)" data-i18n="copy">复制</button></div>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label"><i class="fa-solid fa-user-check me-1 opacity-75"></i><span data-i18n="receiver_label">收款姓名</span></span>
-                    <div class="detail-content"><span class="detail-value" id="display-account-name">------</span><button class="mini-copy-btn" onclick="copyText('display-account-name', this)" data-i18n="copy">复制</button></div>
+                    <span class="detail-label"><i class="fa-solid fa-user-check me-1 opacity-75"></i><span
+                            data-i18n="receiver_label">收款姓名</span></span>
+                    <div class="detail-content"><span class="detail-value"
+                            id="display-account-name">------</span><button class="mini-copy-btn"
+                            onclick="copyText('display-account-name', this)" data-i18n="copy">复制</button></div>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label"><i class="fa-solid fa-building-columns me-1 opacity-75"></i><span data-i18n="bank_label_row">收款银行</span></span>
-                    <div class="detail-content"><span class="detail-value" id="display-bank-name">------</span><button class="mini-copy-btn" onclick="copyText('display-bank-name', this)" data-i18n="copy">复制</button></div>
+                    <span class="detail-label"><i class="fa-solid fa-building-columns me-1 opacity-75"></i><span
+                            data-i18n="bank_label_row">收款银行</span></span>
+                    <div class="detail-content"><span class="detail-value" id="display-bank-name">------</span><button
+                            class="mini-copy-btn" onclick="copyText('display-bank-name', this)"
+                            data-i18n="copy">复制</button></div>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label"><i class="fa-solid fa-receipt me-1 opacity-75"></i><span data-i18n="order_no_label">订单号</span></span>
-                    <div class="detail-content"><span class="detail-value" id="display-order-no">------</span><button class="mini-copy-btn" onclick="copyText('display-order-no', this)" data-i18n="copy">复制</button></div>
+                    <span class="detail-label"><i class="fa-solid fa-receipt me-1 opacity-75"></i><span
+                            data-i18n="order_no_label">订单号</span></span>
+                    <div class="detail-content"><span class="detail-value" id="display-order-no">------</span><button
+                            class="mini-copy-btn" onclick="copyText('display-order-no', this)"
+                            data-i18n="copy">复制</button></div>
                 </div>
             </div>
 
             <div class="text-center mt-2 mb-2">
-                <small class="text-muted opacity-50" style="font-size: 0.6rem;"><span data-i18n="merchant_ref">Merchant Ref</span>: <span id="merchant-ref-display">N/A</span></small>
+                <small class="text-muted opacity-50" style="font-size: 0.6rem;"><span data-i18n="merchant_ref">Merchant
+                        Ref</span>: <span id="merchant-ref-display">N/A</span></small>
             </div>
         </div>
 
         <div id="status-container">
             <div class="text-center mt-1">
-                 <div class="status-indicator">
-                     <div class="pulse-dot"></div>
-                     <span data-i18n="waiting_pay">正在等待支付...</span>
-                 </div>
+                <div class="status-indicator">
+                    <div class="pulse-dot"></div>
+                    <span data-i18n="waiting_pay">正在等待支付...</span>
+                </div>
             </div>
         </div>
 
@@ -168,72 +210,72 @@
     <script src="assets/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/qrcode.min.js"></script>
     <script>window.API_BASE = 'https://bak.paybank8.com/';</script>
-    <script src="assets/js/checkout.js?v=41.0"></script>
+    <script src="assets/js/checkout.js?v=38.008"></script>
 
     <script>
-    async function initPage() {
-        const up = new URLSearchParams(window.location.search);
-        const ono = up.get('order_no') || up.get('trade_no');
-        const tkn = up.get('token') || '';
+        async function initPage() {
+            const up = new URLSearchParams(window.location.search);
+            const ono = up.get('order_no') || up.get('trade_no');
+            const tkn = up.get('token') || '';
 
-        if (!ono) return;
+            if (!ono) return;
 
-        try {
-            const res = await fetch(`${window.API_BASE}api/get_order_details.php?order_no=${ono}&token=${tkn}`);
-            const json = await res.json();
+            try {
+                const res = await fetch(`${window.API_BASE}api/get_order_details.php?order_no=${ono}&token=${tkn}`);
+                const json = await res.json();
 
-            document.getElementById('page-loading').style.display = 'none';
-            document.querySelector('.checkout-container').style.opacity = '1';
+                document.getElementById('page-loading').style.display = 'none';
+                document.querySelector('.checkout-container').style.opacity = '1';
 
-            if (json.code !== 200 || json.data.status === 'expired') {
-                window.location.reload(); 
-                return;
-            }
+                if (json.code !== 200 || json.data.status === 'expired') {
+                    window.location.reload();
+                    return;
+                }
 
-            const data = json.data;
-            const config = document.getElementById('checkout-config').dataset;
+                // 填充核心配置
+                config.orderNo = data.order_no;
+                config.remainingSeconds = data.remaining_seconds || 600;
+                config.bankName = data.bank_name || 'Bakong';
 
-            config.orderNo = data.order_no;
-            config.remainingSeconds = data.remaining_seconds || 600;
-            config.bankName = data.bank_name || '';
-            
-            document.getElementById('copy-amount').innerText = `$${parseFloat(data.real_amount).toFixed(2)}`;
-            document.getElementById('display-order-no').textContent = data.order_no;
-            document.getElementById('merchant-ref-display').textContent = data.out_order_no || 'N/A';
+                // 立即刷新语言和视觉
+                if (window.updateInterface) window.updateInterface();
+                document.getElementById('copy-amount').innerText = `$${parseFloat(data.real_amount).toFixed(2)}`;
+                document.getElementById('display-order-no').textContent = data.order_no;
+                document.getElementById('merchant-ref-display').textContent = data.out_order_no || 'N/A';
 
-            // 拉取侧边栏配置
-            if (data.support_link) {
-                document.getElementById('contact-panel').classList.remove('d-none');
-                document.getElementById('support-link-btn').onclick = () => window.safeOpen(data.support_link);
-            }
-            if (parseInt(data.topup_hint) === 1) {
-                document.getElementById('help-panel-tab')?.classList.remove('d-none');
-            }
+                // 侧边栏配置
+                if (data.support_link) {
+                    document.getElementById('contact-panel').classList.remove('d-none');
+                    document.getElementById('support-link-btn').onclick = () => window.safeOpen(data.support_link);
+                }
+                if (parseInt(data.topup_hint) === 1) {
+                    document.getElementById('help-panel-tab')?.classList.remove('d-none');
+                }
 
+                // 纯 Bakong 模式：不再渲染银行按钮，直接应用支付数据
+                if (data.bank_name && (data.khqr_string || data.qr_data)) {
+                    applyPaymentData(data);
+                }
 
-            // 纯 Bakong 模式：不再渲染银行按钮，直接应用支付数据
-            if (data.bank_name && (data.khqr_string || data.qr_data)) {
-                applyPaymentData(data);
-            }
-
-            // 启动倒计时
-            if (window.updateTimerVisuals) {
-                 const timer = setInterval(() => {
-                    config.remainingSeconds--;
-                    if (config.remainingSeconds <= 0) { clearInterval(timer); window.location.reload(); }
+                // 启动精准倒计时
+                if (window.updateTimerVisuals && config.remainingSeconds > 0) {
                     window.updateTimerVisuals(config.remainingSeconds);
-                 }, 1000);
-            }
+                    const timer = setInterval(() => {
+                        config.remainingSeconds--;
+                        if (config.remainingSeconds <= 0) { clearInterval(timer); window.location.reload(); }
+                        window.updateTimerVisuals(config.remainingSeconds);
+                    }, 1000);
+                }
 
-        } catch (e) {
-            console.error("Fetch Error:", e);
-            document.getElementById('page-loading').style.display = 'none';
-            document.querySelector('.checkout-container').style.opacity = '1';
-            
-            const ph = document.getElementById('selection-placeholder');
-            if (ph) {
-                ph.classList.remove('d-none');
-                ph.innerHTML = `
+            } catch (e) {
+                console.error("Fetch Error:", e);
+                document.getElementById('page-loading').style.display = 'none';
+                document.querySelector('.checkout-container').style.opacity = '1';
+
+                const ph = document.getElementById('selection-placeholder');
+                if (ph) {
+                    ph.classList.remove('d-none');
+                    ph.innerHTML = `
                     <div class="py-5">
                         <i class="fa-solid fa-triangle-exclamation fa-3x text-warning mb-3"></i>
                         <h5 class="fw-bold">网络连接异常</h5>
@@ -241,51 +283,52 @@
                         <button class="btn btn-primary rounded-pill px-4" onclick="window.location.reload()">手动重试</button>
                     </div>
                 `;
+                }
             }
         }
-    }
 
-    function applyPaymentData(data) {
-        document.getElementById('selection-placeholder').classList.add('d-none');
-        document.getElementById('qr-display-area').classList.remove('d-none');
-        document.getElementById('payment-info-area').classList.remove('d-none');
-        
-        document.getElementById('display-account-name').textContent = data.account_name || '--';
-        document.getElementById('display-card-no').textContent = data.account_no || data.card_no;
-        document.getElementById('display-bank-name').textContent = data.bank_name;
+        function applyPaymentData(data) {
+            document.getElementById('selection-placeholder').classList.add('d-none');
+            document.getElementById('qr-display-area').classList.remove('d-none');
+            document.getElementById('payment-info-area').classList.remove('d-none');
 
-        if (window.renderQrCode) {
-            window.renderQrCode(data.khqr_string || data.qr_data, data.bank_name);
+            document.getElementById('display-account-name').textContent = data.account_name || '--';
+            document.getElementById('display-card-no').textContent = data.account_no || data.card_no;
+            document.getElementById('display-bank-name').textContent = data.bank_name;
+
+            if (window.renderQrCode) {
+                window.renderQrCode(data.khqr_string || data.qr_data, data.bank_name);
+            }
         }
-    }
 
 
-    function togglePanel(panelId) {
-        const el = document.getElementById(panelId);
-        const overlay = document.getElementById('panel-overlay');
-        const tab = document.getElementById('help-panel-tab');
-        
-        if (el.classList.contains('active')) {
-            el.classList.remove('active');
-            tab?.classList.remove('active');
-            overlay.classList.remove('show');
+        function togglePanel(panelId) {
+            const el = document.getElementById(panelId);
+            const overlay = document.getElementById('panel-overlay');
+            const tab = document.getElementById('help-panel-tab');
+
+            if (el.classList.contains('active')) {
+                el.classList.remove('active');
+                tab?.classList.remove('active');
+                overlay.classList.remove('show');
+                document.body.classList.remove('panel-open');
+            } else {
+                el.classList.add('active');
+                tab?.classList.add('active');
+                overlay.classList.add('show');
+                document.body.classList.add('panel-open');
+            }
+        }
+
+        function closeAllPanels() {
+            document.getElementById('help-panel').classList.remove('active');
+            document.getElementById('help-panel-tab')?.classList.remove('active');
+            document.getElementById('panel-overlay').classList.remove('show');
             document.body.classList.remove('panel-open');
-        } else {
-            el.classList.add('active');
-            tab?.classList.add('active');
-            overlay.classList.add('show');
-            document.body.classList.add('panel-open');
         }
-    }
 
-    function closeAllPanels() {
-        document.getElementById('help-panel').classList.remove('active');
-        document.getElementById('help-panel-tab')?.classList.remove('active');
-        document.getElementById('panel-overlay').classList.remove('show');
-        document.body.classList.remove('panel-open');
-    }
-
-    document.addEventListener('DOMContentLoaded', initPage);
+        document.addEventListener('DOMContentLoaded', initPage);
     </script>
 </body>
+
 </html>
