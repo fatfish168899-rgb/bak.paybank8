@@ -227,10 +227,8 @@
                 document.getElementById('page-loading').style.display = 'none';
                 document.querySelector('.checkout-container').style.opacity = '1';
 
-                if (json.code !== 200 || json.data.status === 'expired') {
-                    window.location.reload();
-                    return;
-                }
+                const data = json.data;
+                const config = document.getElementById('checkout-config').dataset;
 
                 // 填充核心配置
                 config.orderNo = data.order_no;
