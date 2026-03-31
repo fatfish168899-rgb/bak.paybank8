@@ -308,21 +308,27 @@
         </button>
     </div>
 
-    <!-- [V35.1 ULTIMATE] 强制使用全局 CDN 加速，彻底解决资源 404 加载失败问题 -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-    
     <script>
-        // [V35.1] 强制设定主备份链路
+        // [V36.0 HYPER-RECOVERY]
         window.CHECKOUT_UPSTREAM_ORIGIN = 'https://bak.paybank8.com';
         (function() {
+            console.error("--- PB-SYSTEM V36.0 DIAGNOSTIC START ---");
             var isFile = location.protocol === 'file:';
-            // 模式 A：如果本地转发出现 NetworkError，代码会自动跳到模式 B (直连后端)
             window.API_BASE = isFile ? (window.CHECKOUT_UPSTREAM_ORIGIN + '/') : (location.origin + '/');
-            console.warn("PB-SYSTEM READY (V35)");
+            
+            // 实时检查静态资源加载情况
+            window.addEventListener('error', function(e) {
+                if (e.target.tagName === 'SCRIPT') {
+                    console.error("Critical Asset Failed:", e.target.src);
+                }
+            }, true);
+            
+            console.log("Environment Origin:", location.origin);
+            console.log("Target API Base:", window.API_BASE);
+            console.error("--- PB-SYSTEM V36.0 DIAGNOSTIC END ---");
         })();
     </script>
-    <script src="assets/js/checkout.js?v=35.0"></script>
+    <script src="assets/js/checkout.js?v=36.0_FORCE_REFRESH"></script>
 </body>
 
 </html>
