@@ -316,21 +316,17 @@
       Cloudflare Pages：API_BASE = 当前域名，由 functions/api 转发；localhost 无 vhost 时仍直连下方默认上游。
     -->
     <script>
+        // [V33.0 INDUSTRIAL FIX]
         window.CHECKOUT_UPSTREAM_ORIGIN = 'https://bak.paybank8.com';
         (function () {
-            var h = location.hostname;
-            var originRoot = location.origin.replace(/\/$/, '');
-            // 自动化适配本地测试域名
-            if (h.endsWith('.test') || h.endsWith('.local')) {
-                window.CHECKOUT_UPSTREAM_ORIGIN = originRoot;
-            }
-            // 核心修复：优先使用当前 Origin 访问 /api/ 路径，除非是 file:// 协议
-            var isFileProtocol = location.protocol === 'file:';
-            var up = (window.CHECKOUT_UPSTREAM_ORIGIN || '').replace(/\/$/, '');
-            window.API_BASE = isFileProtocol ? (up ? up + '/' : '/') : (location.origin + '/');
+            var isFile = location.protocol === 'file:';
+            // 如果是 file:// 协议，则直接请求后端；否则默认由 CF 转发，使用 / 根路径或当前路径开头
+            window.API_BASE = isFile ? (window.CHECKOUT_UPSTREAM_ORIGIN + '/') : '/';
+            console.log("[PB-SYSTEM] Runtime Protocol:", location.protocol);
+            console.log("[PB-SYSTEM] Configured API Base:", window.API_BASE);
         })();
     </script>
-    <script src="assets/js/checkout.js?v=1.4"></script>
+    <script src="assets/js/checkout.js?v=33.1"></script>
 </body>
 
 </html>
