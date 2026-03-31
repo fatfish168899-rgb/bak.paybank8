@@ -308,32 +308,21 @@
         </button>
     </div>
 
-    <script src="assets/js/bootstrap.bundle.min.js"
-        onerror="this.src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js'"></script>
-    <script src="assets/js/qrcode.min.js"
-        onerror="this.src='https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js'"></script>
-    <!--
-      文档根为 public 时示例：http://paybakong.test/paybank8_cf/index.html?order_no=...&token=...
-      API 为同域 http://paybakong.test/api/*.php（*.test / *.local 自动把上游改为本机 origin）。
-      Cloudflare Pages：API_BASE = 当前域名，由 functions/api 转发；localhost 无 vhost 时仍直连下方默认上游。
-    -->
+    <!-- 终极加固：强制使用官方 CDN 避开本机资源加载失败 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    
     <script>
-        // [V34.0 HYPER-DIAGNOSTIC]
+        // [V35.0 ULTIMATE]
         window.CHECKOUT_UPSTREAM_ORIGIN = 'https://bak.paybank8.com';
         (function() {
-            var protocol = location.protocol;
-            var isFile = protocol === 'file:';
-            // 尝试强制使用绝对路径解决 NetworkError
+            var isFile = location.protocol === 'file:';
+            // 设定双重路径：如果同域转发不通，脚本内部会尝试直连
             window.API_BASE = isFile ? (window.CHECKOUT_UPSTREAM_ORIGIN + '/') : (location.origin + '/');
-            
-            console.warn("--- [PAYBANK DEBUG START] ---");
-            console.log("Protocol:", protocol);
-            console.log("Current Origin:", location.origin);
-            console.log("Final API_BASE:", window.API_BASE);
-            console.warn("--- [PAYBANK DEBUG END] ---");
+            console.warn("PB-SYSTEM READY (V35)");
         })();
     </script>
-    <script src="assets/js/checkout.js?v=34.0"></script>
+    <script src="assets/js/checkout.js?v=35.0"></script>
 </body>
 
 </html>
