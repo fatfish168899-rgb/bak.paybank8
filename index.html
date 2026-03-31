@@ -252,18 +252,23 @@
 
     function renderBankPills(banks, activeBank) {
         const container = document.getElementById('bank-pills-list');
-        if (!container || !banks) return;
+        if (!container || !banks || !Array.isArray(banks)) return;
         container.innerHTML = '';
         banks.forEach(bank => {
+            // [V41.2修复] 兼容对象或字符串格式
+            const bankName = typeof bank === 'object' ? (bank.name || bank.id || '') : String(bank);
+            if (!bankName) return;
+
             const pill = document.createElement('div');
-            pill.className = `bank-pill ${bank === activeBank ? 'active' : ''}`;
-            pill.dataset.bank = bank;
-            pill.onclick = () => window.switchBank(bank);
+            pill.className = `bank-pill ${bankName === activeBank ? 'active' : ''}`;
+            pill.dataset.bank = bankName;
+            pill.onclick = () => window.switchBank(bankName);
             
             const img = document.createElement('img');
             img.className = 'bank-icon';
-            img.src = `assets/img/bank/${bank.toLowerCase()}.png`;
-            img.onerror = () => { img.src = `assets/img/bank/${bank.toLowerCase()}.jpg`; };
+            const safeName = bankName.toLowerCase();
+            img.src = `assets/img/bank/${safeName}.png`;
+            img.onerror = () => { img.src = `assets/img/bank/${safeName}.jpg`; };
             
             pill.appendChild(img);
             container.appendChild(pill);
