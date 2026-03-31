@@ -187,9 +187,9 @@
         <!-- 订单过期遮罩层 (V46.0) -->
         <div id="expiry-mask" style="display:none; position:fixed; inset:0; background:#f8f9fa; z-index:10001; flex-direction:column; align-items:center; justify-content:center; padding: 40px; text-align: center;">
             <i class="fa-solid fa-clock-rotate-left text-muted mb-4" style="font-size: 100px; color: #ced4da !important;"></i>
-            <h2 class="fw-bold mb-2 text-danger">Order Expired!</h2>
-            <p class="text-muted mb-4">Payment time has expired, please restart the payment.<br>The current QR code is invalid.</p>
-            <button class="btn btn-primary px-5 py-2 rounded-pill" onclick="window.location.reload()">Retry / 刷新重试</button>
+            <h2 class="fw-bold mb-2 text-danger" data-i18n="order_expired">Order Expired!</h2>
+            <p class="text-muted mb-4" data-i18n="expire_desc">Payment time has expired, please restart the payment.<br>The current QR code is invalid.</p>
+            <button class="btn btn-primary px-5 py-2 rounded-pill" onclick="window.location.reload()" data-i18n="retry_btn">Retry / 刷新重试</button>
         </div>
 
         <!-- 配置容器 -->
@@ -344,7 +344,13 @@
         function showExpiryMask() {
             const mask = document.getElementById('expiry-mask');
             if (mask) mask.style.display = 'flex';
-            document.querySelector('.checkout-container').style.filter = 'blur(10px) grayscale(100%)';
+            // 从强力模糊改为“褪色锁死”视觉 (V46.1)
+            const container = document.querySelector('.checkout-container');
+            if (container) {
+                container.style.filter = 'grayscale(100%)';
+                container.style.opacity = '0.35';
+                container.style.pointerEvents = 'none'; // 彻底禁用交互
+            }
             document.getElementById('status-container').style.display = 'none';
         }
 
