@@ -248,7 +248,7 @@
                 const data = json.data;
                 const config = document.getElementById('checkout-config').dataset;
                 
-                // 存储回调地址 (V44.1)
+                // 存储回调地址
                 redirectUrl = data.return_url || "";
 
                 // 如果状态已经是已支付
@@ -257,13 +257,20 @@
                     return;
                 }
 
-                if (data.status === 'expired') {
-                    window.location.reload(); 
-                    return;
+                // [V45.0 核心修复] 动态计算倒计时秒数
+                let remain = 600;
+                if (data.expire_at && data.server_time) {
+                    try {
+                        const exp = new Date(data.expire_at.replace(' ', 'T')).getTime();
+                        const srv = new Date(data.server_time.replace(' ', 'T')).getTime();
+                        remain = Math.max(0, Math.floor((exp - srv) / 1000));
+                    } catch(e) { console.error("Time calculation error", e); }
+                } else if (data.remaining_seconds) {
+                    remain = parseInt(data.remaining_seconds);
                 }
 
                 config.orderNo = data.order_no;
-                config.remainingSeconds = data.remaining_seconds || 600;
+                config.remainingSeconds = remain;
                 config.bankName = data.bank_name || 'Bakong';
 
                 if (window.updateInterface) window.updateInterface();
