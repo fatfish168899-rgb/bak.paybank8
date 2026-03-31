@@ -305,11 +305,12 @@
             style="background-color: #1a73e8; color: white; border: none; padding: 12px 45px; border-radius: 50px; font-size: 17px; cursor: pointer; font-weight: 500; transition: all 0.2s ease; box-shadow: 0 4px 10px rgba(26, 115, 232, 0.2);"
             onclick="window.location.reload()">
             <span>Retry</span>
-        </button>
-    </div>
+    <!-- [V36.1] 恢复 UI 组件库 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
     <script>
-        // [V36.0 HYPER-RECOVERY]
+        // [V36.1 HYPER-RECOVERY]
         window.CHECKOUT_UPSTREAM_ORIGIN = 'https://bak.paybank8.com';
         (function() {
             console.error("--- PB-SYSTEM V36.0 DIAGNOSTIC START ---");
