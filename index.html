@@ -308,16 +308,16 @@
         </button>
     </div>
 
-    <!-- 终极加固：强制使用官方 CDN 避开本机资源加载失败 -->
+    <!-- [V35.1 ULTIMATE] 强制使用全局 CDN 加速，彻底解决资源 404 加载失败问题 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     
     <script>
-        // [V35.0 ULTIMATE]
+        // [V35.1] 强制设定主备份链路
         window.CHECKOUT_UPSTREAM_ORIGIN = 'https://bak.paybank8.com';
         (function() {
             var isFile = location.protocol === 'file:';
-            // 设定双重路径：如果同域转发不通，脚本内部会尝试直连
+            // 模式 A：如果本地转发出现 NetworkError，代码会自动跳到模式 B (直连后端)
             window.API_BASE = isFile ? (window.CHECKOUT_UPSTREAM_ORIGIN + '/') : (location.origin + '/');
             console.warn("PB-SYSTEM READY (V35)");
         })();
