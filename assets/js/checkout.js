@@ -679,10 +679,20 @@ async function initPage() {
 
     try {
         const detailsUrl = checkoutApiGetUrl('api/get_order_details.php', { order_no: ono, token: tkn });
-        console.log("[V32 Debug] Fetching Details:", detailsUrl);
-        const res = await fetch(detailsUrl, { cache: 'no-store' });
-        if (!res.ok) throw new Error('API request failed');
+        console.log("[V34 Debug] Attempting Fetch:", detailsUrl);
+        
+        let res;
+        try {
+            res = await fetch(detailsUrl, { cache: 'no-cache' });
+        } catch (fetchErr) {
+            console.warn("[V34 Debug] First attempt failed, retrying...", fetchErr);
+            // 自动重试一次
+            res = await fetch(detailsUrl, { cache: 'no-store' });
+        }
+
+        if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
         const json = await res.json();
+        console.log("[V34 Debug] Success JSON:", json);
 
         const glLoading = document.getElementById('page-loading');
         if (glLoading) glLoading.style.display = 'none';
