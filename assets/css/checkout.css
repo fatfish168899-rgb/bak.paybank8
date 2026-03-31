@@ -1,0 +1,568 @@
+:root {
+    --primary: #0056ff;
+    --primary-gradient: linear-gradient(135deg, #0056ff 0%, #00a2ff 100%);
+    --bg-light: #f4f7fe;
+    --text-main: #1a2b4b;
+    --text-muted: #6b7c93;
+    --glass-bg: rgba(255, 255, 255, 0.95);
+    --glass-border: rgba(226, 232, 240, 0.8);
+    --km-font: 'Kantumruy Pro', 'Kantumruy', 'Noto Sans Khmer', 'Hanuman', 'Khmer OS Content', 'Khmer Sangam MN', system-ui, sans-serif;
+}
+
+/* 高棉语视觉优化 (V20.1) */
+html[lang="km"] body {
+    font-family: var(--km-font) !important;
+}
+
+html[lang="km"] .detail-label,
+html[lang="km"] .detail-value,
+html[lang="km"] div,
+html[lang="km"] span,
+html[lang="km"] button {
+    font-weight: 500;
+}
+
+html[lang="km"] .fw-bold,
+html[lang="km"] strong {
+    font-weight: 700 !important;
+}
+
+/* 语言切换器样式 */
+.lang-switcher {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 1px 6px;
+    border-radius: 12px;
+    font-size: 0.6rem;
+    color: #666;
+}
+
+.lang-btn {
+    cursor: pointer;
+    padding: 0 3px;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+.lang-btn.active {
+    color: #0d6efd;
+    font-weight: bold;
+}
+
+.lang-btn:hover {
+    color: #0d6efd;
+}
+
+.lang-switcher .divider {
+    margin: 0 2px;
+    opacity: 0.3;
+}
+
+body {
+    background: var(--bg-light);
+    background-image: radial-gradient(at 0% 0%, rgba(0, 86, 255, 0.05) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(0, 162, 255, 0.08) 0px, transparent 50%);
+    font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0;
+}
+
+.checkout-container {
+    max-width: 440px;
+    width: 100%;
+    padding: 0 10px;
+    margin: 0 auto;
+}
+
+/* 核心卡片：移除所有 blur 滤镜，确保锐利 */
+.payment-card {
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1px solid #eef2f6;
+    box-shadow: 0 15px 40px rgba(0, 86, 255, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05);
+    padding: 6px 14px;
+    position: relative;
+    overflow: hidden;
+    margin-top: 0;
+}
+
+.amount-display {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #0055ff;
+    margin: 5px 0 2px 0 !important;
+    letter-spacing: -1px;
+    text-align: center;
+}
+
+.amount-warning-container {
+    margin-top: 0 !important;
+    margin-bottom: 5px !important;
+}
+
+.qr-area {
+    padding: 2px;
+    border-radius: 12px;
+    margin: 4px 0;
+    text-align: center;
+    position: relative;
+}
+
+#qrcode {
+    padding: 0;
+    background: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}
+
+.final-qr-img {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* 圆环倒计时样式 */
+.circular-timer {
+    width: 44px;
+    height: 44px;
+}
+
+.circle-bg {
+    fill: none;
+    stroke: #f1f5f9;
+    stroke-width: 3.5;
+}
+
+.circle {
+    fill: none;
+    stroke: #ff4d4f;
+    stroke-width: 3.5;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.3s ease;
+}
+
+.percentage {
+    fill: #334155;
+    font-size: 9px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800;
+    text-anchor: middle;
+}
+
+/* 订单详情卡片 */
+.order-details-card {
+    background: #fdfdfe;
+    border: 1px solid #f1f5f9;
+    border-radius: 12px;
+    margin: 5px 20px 8px 20px;
+    padding: 2px 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px dashed #e2e8f0;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    min-width: 68px;
+    flex-shrink: 0;
+}
+
+.detail-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-grow: 1;
+    justify-content: flex-end;
+}
+
+.detail-value {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #1e293b;
+    text-align: right;
+    word-break: break-all;
+}
+
+.mini-copy-btn {
+    background: #f0f7ff;
+    color: #448aff;
+    border: none;
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+#display-card-no {
+    font-size: 1.15rem;
+    font-weight: 800;
+}
+
+#display-order-no {
+    font-size: 0.62rem;
+    font-weight: 400;
+    opacity: 0.6;
+    word-break: break-all;
+    line-height: 1.2;
+}
+
+/* 银行选择器 */
+.bank-pill-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    padding: 0 5px;
+}
+
+.bank-pill img {
+    width: 100%;
+    height: 48px;
+    object-fit: contain;
+    background: #fff;
+    border: 1.5px solid #d1d9e0;
+    border-radius: 12px;
+    padding: 3px;
+    transition: all 0.3s;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.bank-pill.active img {
+    border-color: var(--primary);
+    border-width: 2.5px;
+    transform: scale(1.05);
+}
+
+/* QR 保存按钮 */
+.qr-action-group {
+    background: #f1f5f9;
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 8px 20px 0 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.qr-hint-row {
+    padding: 6px 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-align: center;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: #f8fafc;
+}
+
+.qr-save-btn {
+    border: none;
+    width: 100%;
+    padding: 9px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: #ffffff;
+    background: #0056ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+/* 呼吸灯效果 */
+.pulse-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #00c853;
+    border-radius: 50%;
+    margin-right: 8px;
+    box-shadow: 0 0 0 rgba(0, 200, 83, 0.4);
+    animation: dot-pulse 2s infinite ease-in-out;
+}
+
+@keyframes dot-pulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(0, 200, 83, 0.7);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(0, 200, 83, 0);
+    }
+
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(0, 200, 83, 0);
+    }
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.copy-toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+    z-index: 10000;
+    pointer-events: none;
+}
+
+.copy-toast.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -60%);
+}
+
+/* ==========================================================================
+   全新左右状态系统 (V27.3 - 独立解耦版)
+   ========================================================================== */
+
+/* 1. 全局遮罩层 */
+.side-panel-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 3000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.side-panel-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 2. 侧边容器 */
+.side-panel-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* 3. 侧面板包装器 (仅含侧标) */
+.side-panel-wrapper {
+    position: absolute;
+    top: 40%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    z-index: 2500;
+    pointer-events: auto;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* 4. [CRITICAL] 开启面板时强制隐藏侧标 (由 JS 控制 .panel-open 状态) */
+body.panel-open .side-tab {
+    display: none !important;
+}
+
+.side-panel-wrapper.left {
+    left: 0;
+}
+
+.side-panel-wrapper.right {
+    right: 0;
+}
+
+.side-tab {
+    width: 36px;
+    background: #ffb300;
+    color: white;
+    padding: 18px 2px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 179, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    position: absolute;
+    transition: all 0.3s ease;
+}
+
+.side-panel-wrapper.left .side-tab {
+    right: -36px;
+    border-radius: 0 14px 14px 0;
+}
+
+.side-panel-wrapper.right .side-tab {
+    left: -36px;
+    border-radius: 14px 0 0 14px;
+}
+
+.side-tab .tab-text {
+    writing-mode: vertical-lr;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.side-tab .tab-icon {
+    font-size: 0.88rem;
+    transition: all 0.3s;
+}
+
+/* 5. 独立抽屉系统 (彻底解决堆叠上下文与遮挡问题) */
+.side-drawer {
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 3100;
+    /* 高于遮罩层 */
+}
+
+.drawer-header {
+    background: #ffb300;
+    padding: 18px 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: white;
+}
+
+.header-icon-box {
+    width: 38px;
+    height: 38px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.header-text .main-title {
+    font-weight: 800;
+    font-size: 0.9rem;
+}
+
+.header-text .sub-title {
+    font-size: 0.65rem;
+    opacity: 0.9;
+}
+
+.drawer-content {
+    padding: 15px;
+    max-height: 75vh;
+    overflow-y: auto;
+}
+
+.help-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    cursor: pointer;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* PC 适配 (滑出) */
+@media (min-width: 769px) {
+    .side-drawer {
+        width: 320px;
+        position: absolute;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        right: 45px;
+        top: 40%;
+        transform: translateY(-50%) translateX(15px);
+        border-radius: 16px;
+    }
+
+    .side-drawer.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(-50%) translateX(0);
+    }
+}
+
+/* 手机 适配 (底部弹出 - 核心修复) */
+@media (max-width: 768px) {
+    .side-panel-wrapper {
+        position: fixed;
+        z-index: 2800;
+    }
+
+    .side-panel-wrapper.left {
+        left: 0;
+        top: 40%;
+    }
+
+    .side-panel-wrapper.right {
+        right: 0;
+        left: auto;
+        top: 40%;
+    }
+
+    .side-drawer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100vw !important;
+        height: auto;
+        max-height: 80vh;
+        transform: translateY(100%);
+        /* 初始隐藏 */
+        transition: transform 0.4s cubic-bezier(0.1, 0.7, 0.1, 1);
+        border-radius: 24px 24px 0 0 !important;
+        box-shadow: 0 -15px 50px rgba(0, 0, 0, 0.3);
+    }
+
+    .side-drawer.active {
+        transform: translateY(0);
+        /* 激活弹出 */
+    }
+}
+
+/* 旧版弹窗图片兼容 */
+#topupHintModal img {
+    max-height: 80vh;
+    object-fit: contain;
+}
