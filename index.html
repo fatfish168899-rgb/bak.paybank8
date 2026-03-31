@@ -73,9 +73,7 @@
                 </div>
             </div>
 
-            <div class="bank-pill-container mb-3" id="bank-pills-list">
-                <!-- 由 JS 动态生成 -->
-            </div>
+            <!-- 移除了多余的内联银行选择器 (V42.0 纯 Bakong 版) -->
 
             <div class="qr-area d-none" id="qr-display-area">
                 <div id="qrcode" class="mx-auto"></div>
@@ -212,17 +210,14 @@
                 document.getElementById('help-panel-tab')?.classList.remove('d-none');
             }
 
-            // 渲染银行选择器
-            renderBankPills(data.available_banks, data.bank_name);
 
-            // 如果已有银行卡信息
+            // 纯 Bakong 模式：不再渲染银行按钮，直接应用支付数据
             if (data.bank_name && (data.khqr_string || data.qr_data)) {
                 applyPaymentData(data);
             }
 
             // 启动倒计时
             if (window.updateTimerVisuals) {
-                 const total = 600;
                  const timer = setInterval(() => {
                     config.remainingSeconds--;
                     if (config.remainingSeconds <= 0) { clearInterval(timer); window.location.reload(); }
@@ -248,47 +243,6 @@
                 `;
             }
         }
-    }
-
-    function renderBankPills(banks, activeBank) {
-        const container = document.getElementById('bank-pills-list');
-        if (!container) return;
-        container.innerHTML = '';
-        
-        if (!banks || !Array.isArray(banks)) {
-            console.warn("Invalid banks data received:", banks);
-            return;
-        }
-
-        banks.forEach(bank => {
-            try {
-                // 彻底防御：确保 bank 转化为有效的字符串
-                let bankName = "";
-                if (typeof bank === 'string') {
-                    bankName = bank;
-                } else if (bank && typeof bank === 'object') {
-                    bankName = bank.name || bank.id || bank.bank_name || "";
-                }
-                
-                if (!bankName) return;
-
-                const pill = document.createElement('div');
-                pill.className = `bank-pill ${bankName === activeBank ? 'active' : ''}`;
-                pill.dataset.bank = bankName;
-                pill.onclick = () => window.switchBank(bankName);
-                
-                const img = document.createElement('img');
-                img.className = 'bank-icon';
-                const safeFileName = String(bankName).toLowerCase();
-                img.src = `assets/img/bank/${safeFileName}.png`;
-                img.onerror = () => { img.src = `assets/img/bank/${safeFileName}.jpg`; };
-                
-                pill.appendChild(img);
-                container.appendChild(pill);
-            } catch (err) {
-                console.error("Error rendering individual bank pill:", err, bank);
-            }
-        });
     }
 
     function applyPaymentData(data) {
