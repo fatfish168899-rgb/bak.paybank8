@@ -115,12 +115,21 @@ const I18N = {
 const BANK_COLORS = { 'BAKONG': '#ED1C24' };
 
 function getDetectLanguage() {
+    // 1. 优先检查 Cookie (与 PHP 后端同步)
+    const cookieLang = document.cookie.split('; ').find(row => row.startsWith('paybakong_lang='))?.split('=')[1];
+    if (cookieLang) return cookieLang;
+
+    // 2. 检查 LocalStorage
     const saved = localStorage.getItem('paybank_lang');
     if (saved) return saved;
-    const browserLang = (navigator.language || navigator.userLanguage || 'km').toLowerCase();
+
+    // 3. 系统语言自动感应
+    const browserLang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
     if (browserLang.startsWith('zh')) return 'zh';
-    if (browserLang.startsWith('en')) return 'en';
-    return 'km';
+    if (browserLang.startsWith('km')) return 'km';
+    
+    // 4. 最终回退到英语
+    return 'en';
 }
 
 let currentLang = getDetectLanguage();
@@ -128,7 +137,8 @@ let currentLang = getDetectLanguage();
 window.setLanguage = function (lang) {
     currentLang = lang;
     localStorage.setItem('paybank_lang', lang);
-    document.cookie = "paybank_lang=" + lang + "; path=/; max-age=" + (30 * 24 * 60 * 60);
+    // 统一 Cookie 名称为 paybakong_lang
+    document.cookie = "paybakong_lang=" + lang + "; path=/; max-age=" + (30 * 24 * 60 * 60);
     updateInterface();
 }
 
