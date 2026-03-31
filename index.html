@@ -162,11 +162,22 @@
                 </div>
             </div>
 
+    <!-- 支付成功遮罩层 (V44.0) -->
+    <div id="success-mask" style="display:none; position:fixed; inset:0; background:#ffffff; z-index:10000; flex-direction:column; align-items:center; justify-content:center; padding: 20px;">
+        <i class="fa-solid fa-circle-check text-success mb-4" style="font-size: 100px; color: #198754;"></i>
+        <h2 class="fw-bold mb-3" data-i18n="pay_success">支付成功!</h2>
+        <p class="text-muted text-center" id="success-hint">页面将在 <span id="close-sec" class="fw-bold text-dark">3</span> 秒内自动跳转...</p>
+        <button class="btn btn-primary px-5 py-2 rounded-pill mt-4" onclick="handleRedirection()" data-i18n="close_page">返回商户</button>
+    </div>
+
+    <!-- 配置容器 -->
+    <div id="checkout-config" data-khqr="" data-order-no="" data-amount="0.00" data-remaining-seconds="0" data-bank-name=""></div>
+
+        <div class="side-panel-container">
             <div class="text-center mt-2 mb-2">
-                <small class="text-muted opacity-50" style="font-size: 0.6rem;"><span data-i18n="merchant_ref">Merchant
-                        Ref</span>: <span id="merchant-ref-display">N/A</span></small>
+                <small class="text-muted opacity-50" style="font-size: 0.6rem;"><span data-i18n="merchant_ref">Merchant Ref</span>: <span id="merchant-ref-display">N/A</span></small>
             </div>
-        </div>
+        </div><!-- .payment-card END -->
 
         <div id="status-container">
             <div class="text-center mt-1">
@@ -210,9 +221,11 @@
     <script src="assets/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/qrcode.min.js"></script>
     <script>window.API_BASE = 'https://bak.paybank8.com/';</script>
-    <script src="assets/js/checkout.js?v=38.038"></script>
+    <script src="assets/js/checkout.js?v=44.1"></script>
 
     <script>
+        let redirectUrl = "";
+
         async function initPage() {
             const up = new URLSearchParams(window.location.search);
             const ono = up.get('order_no') || up.get('trade_no');
@@ -227,35 +240,57 @@
                 document.getElementById('page-loading').style.display = 'none';
                 document.querySelector('.checkout-container').style.opacity = '1';
 
+                if (json.code !== 200) {
+                    setTimeout(() => window.location.reload(), 3000);
+                    return;
+                }
+
                 const data = json.data;
                 const config = document.getElementById('checkout-config').dataset;
+                
+                // 存储回调地址 (V44.1)
+                redirectUrl = data.return_url || "";
 
-                // 填充核心配置
+                // 如果状态已经是已支付
+                if (data.status === 'paid') {
+                    showSuccessMask();
+                    return;
+                }
+
+                if (data.status === 'expired') {
+                    window.location.reload(); 
+                    return;
+                }
+
                 config.orderNo = data.order_no;
                 config.remainingSeconds = data.remaining_seconds || 600;
                 config.bankName = data.bank_name || 'Bakong';
 
-                // 立即刷新语言和视觉
                 if (window.updateInterface) window.updateInterface();
                 document.getElementById('copy-amount').innerText = `$${parseFloat(data.real_amount).toFixed(2)}`;
                 document.getElementById('display-order-no').textContent = data.order_no;
                 document.getElementById('merchant-ref-display').textContent = data.out_order_no || 'N/A';
 
-                // 侧边栏配置
+                // 侧边栏
                 if (data.support_link) {
-                    document.getElementById('contact-panel').classList.remove('d-none');
-                    document.getElementById('support-link-btn').onclick = () => window.safeOpen(data.support_link);
+                    const panel = document.getElementById('contact-panel');
+                    if (panel) {
+                        panel.classList.remove('d-none');
+                        const btn = document.getElementById('support-link-btn');
+                        if (btn) btn.onclick = () => window.safeOpen(data.support_link);
+                    }
                 }
+                
                 if (parseInt(data.topup_hint) === 1) {
                     document.getElementById('help-panel-tab')?.classList.remove('d-none');
                 }
 
-                // 纯 Bakong 模式：不再渲染银行按钮，直接应用支付数据
+                // 应用支付信息
                 if (data.bank_name && (data.khqr_string || data.qr_data)) {
                     applyPaymentData(data);
                 }
 
-                // 启动精准倒计时
+                // 启动倒计时
                 if (window.updateTimerVisuals && config.remainingSeconds > 0) {
                     window.updateTimerVisuals(config.remainingSeconds);
                     const timer = setInterval(() => {
@@ -265,23 +300,46 @@
                     }, 1000);
                 }
 
+                // 启动状态轮询
+                const statusPoller = setInterval(async () => {
+                    try {
+                        const sRes = await fetch(`${window.API_BASE}api/check_order.php?order_no=${ono}&token=${tkn}`);
+                        const sJson = await sRes.json();
+                        if (sJson.status === 'paid') {
+                            clearInterval(statusPoller);
+                            showSuccessMask();
+                        }
+                    } catch (e) {}
+                }, 4000);
+
             } catch (e) {
                 console.error("Fetch Error:", e);
-                document.getElementById('page-loading').style.display = 'none';
-                document.querySelector('.checkout-container').style.opacity = '1';
+                // 暂时不刷新，防止无限循环
+            }
+        }
 
-                const ph = document.getElementById('selection-placeholder');
-                if (ph) {
-                    ph.classList.remove('d-none');
-                    ph.innerHTML = `
-                    <div class="py-5">
-                        <i class="fa-solid fa-triangle-exclamation fa-3x text-warning mb-3"></i>
-                        <h5 class="fw-bold">网络连接异常</h5>
-                        <p class="text-muted small">无法从源站获取订单数据，请检查网络或更换浏览器</p>
-                        <button class="btn btn-primary rounded-pill px-4" onclick="window.location.reload()">手动重试</button>
-                    </div>
-                `;
-                }
+        function showSuccessMask() {
+            const mask = document.getElementById('success-mask');
+            if (mask) {
+                mask.style.display = 'flex';
+                let sec = 3;
+                const timer = setInterval(() => {
+                    sec--;
+                    const secEl = document.getElementById('close-sec');
+                    if (secEl) secEl.innerText = sec;
+                    if (sec <= 0) {
+                        clearInterval(timer);
+                        handleRedirection();
+                    }
+                }, 1000);
+            }
+        }
+
+        function handleRedirection() {
+            if (redirectUrl) {
+                window.location.replace(redirectUrl);
+            } else {
+                window.close();
             }
         }
 
