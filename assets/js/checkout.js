@@ -343,34 +343,4 @@ window.switchBank = async function (bankName) {
     } catch (error) { console.error(error); }
 };
 
-document.addEventListener('DOMContentLoaded', function () {
-    updateInterface();
-    const configEl = document.getElementById('checkout-config');
-    if (!configEl) return;
-
-    // 倒计时
-    let sec = parseInt(configEl.dataset.remainingSeconds);
-    if (!isNaN(sec) && sec > 0) {
-        const expireTime = Date.now() + (sec * 1000);
-        const timer = setInterval(() => {
-            const diff = Math.floor((expireTime - Date.now()) / 1000);
-            if (diff <= 0) { clearInterval(timer); window.location.reload(); return; }
-            updateTimerVisuals(diff);
-        }, 1000);
-    }
-
-    // 轮询状态
-    const up = new URLSearchParams(window.location.search);
-    const tkn = up.get('token') || '';
-    const statusPoller = setInterval(async () => {
-        try {
-            const apiBase = window.API_BASE || '';
-            const res = await fetch(`${apiBase}api/check_order.php?order_no=${configEl.dataset.orderNo}&token=${tkn}`);
-            const json = await res.json();
-            if (json.status === 'paid') {
-                clearInterval(statusPoller);
-                window.location.reload();
-            }
-        } catch (e) { }
-    }, 4000);
-});
+// 核心初始化逻辑已迁移至 index.html (V43.0)
