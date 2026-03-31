@@ -679,7 +679,8 @@ async function initPage() {
 
     try {
         const detailsUrl = checkoutApiGetUrl('api/get_order_details.php', { order_no: ono, token: tkn });
-        const res = await fetch(detailsUrl, checkoutFetchDefaults);
+        console.log("[V32 Debug] Fetching Details:", detailsUrl);
+        const res = await fetch(detailsUrl, { cache: 'no-store' });
         if (!res.ok) throw new Error('API request failed');
         const json = await res.json();
 
