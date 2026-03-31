@@ -1,7 +1,19 @@
 /**
- * PayBank Checkout Logic
- * Version: 1.2.1
+ * PayBank Checkout Logic (Consolidated Industrial Version 31.9)
+ * One JS to rule them all - Built for Cloudflare & Cross-domain deployments.
  */
+
+// 全局变量提取自 index.html 整合逻辑 (V31.9)
+let urlParams = new URLSearchParams(window.location.search);
+let currentToken = urlParams.get('token') || '';
+
+const getUrlOrderNo = () => {
+    return urlParams.get('order_no') || urlParams.get('trade_no') || urlParams.get('out_order_no');
+};
+
+const getUrlToken = () => {
+    return urlParams.get('token') || currentToken;
+};
 
 const I18N = {
     km: {
@@ -35,7 +47,7 @@ const I18N = {
         contact_us: "ទាក់ទងមកយើង",
         help_guide: "ការណែនាំ",
         click_close: "ចុចលើរូបភាពដើម្បីបិទ",
-        help_img: "/assets/img/topup_hint_km.jpg?v=1.0",
+        help_img: "assets/img/topup_hint_km.jpg?v=1.0",
         merchant_ref: "លេខយោងអាជីវករ",
         supported_banks_hint: "សូមប្រើ Bakong ឬ App ធនាគារដែលគាំទ្រ KHQR"
     },
@@ -70,7 +82,7 @@ const I18N = {
         contact_us: "Contact Us",
         help_guide: "Help Guide",
         click_close: "Click to close",
-        help_img: "/assets/img/topup_hint_en.jpg?v=1.0",
+        help_img: "assets/img/topup_hint_en.jpg?v=1.0",
         merchant_ref: "Merchant Ref",
         supported_banks_hint: "Use Bakong or a bank app that supports KHQR"
     },
@@ -105,7 +117,7 @@ const I18N = {
         contact_us: "联系我们",
         help_guide: "帮助指引",
         click_close: "点击图片可收回",
-        help_img: "/assets/img/topup_hint_zh.jpg?v=1.0",
+        help_img: "assets/img/topup_hint_zh.jpg?v=1.0",
         merchant_ref: "商户单号",
         supported_banks_hint: "请使用 Bakong 或支持 KHQR 的银行 App 扫码支付"
     }
@@ -152,8 +164,6 @@ window.safeOpen = function (url) {
     }
 }
 
-const urlParams = new URLSearchParams(window.location.search);
-const currentToken = urlParams.get('token') || '';
 
 function updateInterface() {
     document.documentElement.lang = currentLang; // 设置语言标识以优化字体 (V20.1)
@@ -167,7 +177,8 @@ function updateInterface() {
     // 动态切换帮助图片 (V27.4)
     const helpImgEl = document.querySelector('.help-img');
     if (helpImgEl && I18N[currentLang].help_img) {
-        helpImgEl.src = I18N[currentLang].help_img;
+        const apiBase = window.API_BASE || '';
+        helpImgEl.src = apiBase + I18N[currentLang].help_img;
     }
 
     const kmBtn = document.getElementById('lang-km');
@@ -314,7 +325,8 @@ window.renderQrCode = function (qrData, bankName) {
         };
 
         const logo = new Image();
-        const logoPath = "assets/img/bank_logo/bakong_logo.png";
+        const apiBase = window.API_BASE || '';
+        const logoPath = apiBase + "assets/img/bank_logo/bakong_logo.png";
 
         if (logoPath) {
             logo.src = logoPath;
@@ -390,7 +402,8 @@ async function generateFancyCanvas(qrSource, bankName, orderNo) {
         };
 
         const logo = new Image();
-        const logoPath = "assets/img/bank_logo/bakong_logo.png";
+        const apiBase = window.API_BASE || '';
+        const logoPath = apiBase + "assets/img/bank_logo/bakong_logo.png";
 
         if (logoPath) {
             logo.src = logoPath;
@@ -552,7 +565,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!configEl) return;
         try {
             const apiBase = window.API_BASE || '';
-            const res = await fetch(`${apiBase}api/check_order.php?order_no=${configEl.dataset.orderNo}&token=${currentToken}`);
+            const res = await fetch(`${apiBase}api/check_order.php?order_no=${configEl.dataset.orderNo}&token=${currentToken || getUrlToken()}`);
             const json = await res.json();
             if (json.status === 'paid') {
                 clearInterval(statusPoller);
@@ -596,6 +609,175 @@ document.addEventListener('DOMContentLoaded', function () {
         } catch (e) { }
     }, 4000);
 });
+
+// [V31.9 CONSOLIDATED INIT LOGIC]
+async function initPage() {
+    const ono = getUrlOrderNo();
+    const tkn = getUrlToken();
+    const apiBase = window.API_BASE || '';
+
+    if (!ono) {
+        console.error("Missing order_no");
+        const ph = document.getElementById('selection-placeholder');
+        if (ph) ph.innerHTML = '<div class="error-overlay py-5"><h5>缺少订单号</h5><p>请通过正确的支付链接访问</p></div>';
+        return;
+    }
+
+    try {
+        const res = await fetch(`${apiBase}api/get_order_details.php?order_no=${ono}&token=${tkn}`);
+        if (!res.ok) throw new Error('API request failed');
+        const json = await res.json();
+
+        const glLoading = document.getElementById('page-loading');
+        if (glLoading) glLoading.style.display = 'none';
+        const container = document.querySelector('.checkout-container');
+        if (container) container.style.opacity = '1';
+
+        if (json.code !== 200) {
+            const ph = document.getElementById('selection-placeholder');
+            if (ph) ph.innerHTML = `<div class="error-overlay py-5"><h5>订单错误</h5><p>${json.msg}</p></div>`;
+            return;
+        }
+
+        const data = json.data;
+        const configEl = document.getElementById('checkout-config');
+        const config = configEl.dataset;
+
+        if (data.status === 'expired') {
+            const mask = document.getElementById('expired-mask');
+            if (mask) {
+                mask.style.display = 'flex';
+                document.querySelector('.checkout-container').style.display = 'none';
+            }
+            return;
+        }
+
+        config.orderNo = data.order_no;
+        config.checkoutMode = data.checkout_mode;
+        config.merchantOrderNo = data.out_order_no;
+
+        const expStr = (data.expire_at || '').replace(/-/g, '/');
+        const srvStr = (data.server_time || '').replace(/-/g, '/');
+        const expireAt = new Date(expStr).getTime();
+        const now = new Date(srvStr).getTime();
+        const createdAt = new Date((data.created_at || '').replace(/-/g, '/')).getTime();
+
+        let remaining = Math.max(0, Math.floor((expireAt - now) / 1000));
+        const total = Math.max(remaining, (expireAt - createdAt) / 1000);
+
+        config.remainingSeconds = remaining;
+        config.initialTotalSeconds = total;
+
+        const amountEl = document.getElementById('copy-amount');
+        if (amountEl) amountEl.innerText = `$${parseFloat(data.real_amount).toFixed(2)}`;
+        const orderNoEl = document.getElementById('display-order-no');
+        if (orderNoEl) orderNoEl.textContent = data.order_no;
+        const merchantRefEl = document.getElementById('merchant-ref-display');
+        if (merchantRefEl) merchantRefEl.textContent = data.out_order_no || 'N/A';
+
+        // 处理侧边面板 (V28.6)
+        if (data.support_link) {
+            const cp = document.getElementById('contact-panel');
+            if (cp) {
+                cp.classList.remove('d-none');
+                const btn = document.getElementById('support-link-btn');
+                if (btn) btn.onclick = () => window.safeOpen(data.support_link);
+            }
+        }
+        if (parseInt(data.topup_hint) === 1) {
+            const hpTab = document.getElementById('help-panel-tab');
+            if (hpTab) hpTab.classList.remove('d-none');
+        }
+
+        renderBankPillsInternal(data.available_banks, data.bank_name);
+
+        if (data.bank_name && (data.khqr_string || data.qr_data)) {
+            config.bankName = data.bank_name;
+            applyLocalPaymentDataInternal(data);
+        } else if (!data.bank_name || data.bank_name.toLowerCase() !== 'bakong') {
+            // [V31.9] 纯 Bakong 模式：自动分配
+            window.switchBank('Bakong');
+        }
+
+        // 调用倒计时逻辑
+        if (typeof window.startCountdown === 'function') {
+            window.startCountdown(remaining);
+        } else {
+             // 如果没有外部倒计时逻辑，内部驱动
+             let sec = remaining;
+             const timerInt = setInterval(() => {
+                 sec--;
+                 if (sec <= 0) {
+                     clearInterval(timerInt);
+                     window.showExpiredState();
+                 }
+                 updateTimerVisuals(sec);
+             }, 1000);
+             updateTimerVisuals(sec);
+        }
+
+    } catch (err) {
+        console.error("Init Error:", err);
+        const glLoading = document.getElementById('page-loading');
+        if (glLoading) glLoading.style.display = 'none';
+        const container = document.querySelector('.checkout-container');
+        if (container) container.style.opacity = '1';
+
+        const ph = document.getElementById('selection-placeholder');
+        if (ph) {
+            ph.innerHTML = `
+                <div class="error-overlay py-5">
+                    <i class="fa-solid fa-triangle-exclamation fa-3x mb-3 text-warning"></i>
+                    <h5 class="fw-bold">检测到连接异常</h5>
+                    <p class="text-muted small">无法加载订单数据，请检查后端 API 域名是否配置正确</p>
+                    <button class="btn btn-sm btn-outline-primary px-4 rounded-pill mt-2" onclick="window.location.reload()"><i class="fa-solid fa-rotate me-2"></i>点击重试</button>
+                </div>`;
+        }
+    }
+}
+
+function renderBankPillsInternal(banks, activeName) {
+    const container = document.getElementById('bank-pills-list');
+    if (!container) return;
+    container.innerHTML = '';
+    if (!banks || banks.length === 0) return;
+
+    banks.forEach(b => {
+        const pill = document.createElement('div');
+        pill.className = `bank-pill ${b.name === activeName ? 'active' : ''}`;
+        pill.dataset.bank = b.name;
+        pill.onclick = () => window.switchBank(b.name);
+
+        const iconName = (b.name.toLowerCase() === 'ac' || b.name.toLowerCase() === 'acleda') ? 'acleda' : b.name.toLowerCase();
+        const apiBase = window.API_BASE || '';
+        pill.innerHTML = `<img src="assets/img/bank/${iconName}.jpg" class="bank-icon" onerror="this.onerror=null; this.src='${apiBase + b.icon}';">`;
+        container.appendChild(pill);
+    });
+}
+
+function applyLocalPaymentDataInternal(data) {
+    const accEl = document.getElementById('display-account-name');
+    if (accEl) accEl.textContent = data.account_name || '--';
+    const cardEl = document.getElementById('display-card-no');
+    if (cardEl) cardEl.textContent = data.account_no || data.card_no;
+    
+    const bName = (data.bank_name.toUpperCase() === 'AC' || data.bank_name.toUpperCase() === 'ACLEDA') ? 'ACLEDA Bank' : data.bank_name.toUpperCase() + ' Bank';
+    const bNameEl = document.getElementById('display-bank-name');
+    if (bNameEl) bNameEl.textContent = bName;
+
+    const infoArea = document.getElementById('payment-info-area');
+    if (infoArea) infoArea.classList.remove('d-none');
+    const qrArea = document.getElementById('qr-display-area');
+    if (qrArea) qrArea.classList.remove('d-none');
+    const phArea = document.getElementById('selection-placeholder');
+    if (phArea) phArea.classList.add('d-none');
+
+    if (typeof window.renderQrCode === 'function') {
+        window.renderQrCode(data.khqr_string || data.qr_data, data.bank_name);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', initPage);
 
 
 
