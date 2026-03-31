@@ -252,26 +252,42 @@
 
     function renderBankPills(banks, activeBank) {
         const container = document.getElementById('bank-pills-list');
-        if (!container || !banks || !Array.isArray(banks)) return;
+        if (!container) return;
         container.innerHTML = '';
-        banks.forEach(bank => {
-            // [V41.2修复] 兼容对象或字符串格式
-            const bankName = typeof bank === 'object' ? (bank.name || bank.id || '') : String(bank);
-            if (!bankName) return;
+        
+        if (!banks || !Array.isArray(banks)) {
+            console.warn("Invalid banks data received:", banks);
+            return;
+        }
 
-            const pill = document.createElement('div');
-            pill.className = `bank-pill ${bankName === activeBank ? 'active' : ''}`;
-            pill.dataset.bank = bankName;
-            pill.onclick = () => window.switchBank(bankName);
-            
-            const img = document.createElement('img');
-            img.className = 'bank-icon';
-            const safeName = bankName.toLowerCase();
-            img.src = `assets/img/bank/${safeName}.png`;
-            img.onerror = () => { img.src = `assets/img/bank/${safeName}.jpg`; };
-            
-            pill.appendChild(img);
-            container.appendChild(pill);
+        banks.forEach(bank => {
+            try {
+                // 彻底防御：确保 bank 转化为有效的字符串
+                let bankName = "";
+                if (typeof bank === 'string') {
+                    bankName = bank;
+                } else if (bank && typeof bank === 'object') {
+                    bankName = bank.name || bank.id || bank.bank_name || "";
+                }
+                
+                if (!bankName) return;
+
+                const pill = document.createElement('div');
+                pill.className = `bank-pill ${bankName === activeBank ? 'active' : ''}`;
+                pill.dataset.bank = bankName;
+                pill.onclick = () => window.switchBank(bankName);
+                
+                const img = document.createElement('img');
+                img.className = 'bank-icon';
+                const safeFileName = String(bankName).toLowerCase();
+                img.src = `assets/img/bank/${safeFileName}.png`;
+                img.onerror = () => { img.src = `assets/img/bank/${safeFileName}.jpg`; };
+                
+                pill.appendChild(img);
+                container.appendChild(pill);
+            } catch (err) {
+                console.error("Error rendering individual bank pill:", err, bank);
+            }
         });
     }
 
