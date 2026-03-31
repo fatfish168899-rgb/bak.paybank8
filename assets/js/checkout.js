@@ -679,28 +679,27 @@ async function initPage() {
 
     try {
         let detailsUrl = checkoutApiGetUrl('api/get_order_details.php', { order_no: ono, token: tkn });
-        console.log("[PB-SYSTEM] Initial Fetch Path:", detailsUrl);
+        console.log("[PB-SYSTEM V36.0] Attempting Local Proxy Fetch:", detailsUrl);
         
         let res;
         try {
-            res = await fetch(detailsUrl, { cache: 'no-cache' });
+            res = await fetch(detailsUrl, { cache: 'no-store' });
         } catch (e) {
-            console.warn("[PB-SYSTEM] Local Proxy Failed (NetworkError). Attempting Direct-Hit Fallback...", e);
-            // [V35.1 HYBRID FALLBACK] 核心逻辑：如果本地转发不通，直接请求源站接口
+            console.error("[PB-SYSTEM V36.0] Local Proxy Failed (NetworkError). Moving to Direct-Hit Fallback.", e);
             const upstream = (window.CHECKOUT_UPSTREAM_ORIGIN || 'https://bak.paybank8.com');
             const fallbackBase = upstream.endsWith('/') ? upstream : (upstream + '/');
             const fallbackUrl = new URL('api/get_order_details.php', fallbackBase);
             fallbackUrl.searchParams.set('order_no', ono);
             fallbackUrl.searchParams.set('token', tkn);
-            fallbackUrl.searchParams.set('mode', 'fallback');
+            fallbackUrl.searchParams.set('cache_buster', Date.now());
             
-            console.log("[PB-SYSTEM] Final Fallback URL:", fallbackUrl.toString());
+            console.warn("[PB-SYSTEM V36.0] Fallback to Upstream:", fallbackUrl.toString());
             res = await fetch(fallbackUrl.toString(), { mode: 'cors', cache: 'no-store' });
         }
 
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (!res.ok) throw new Error(`HTTP Connection Failed: ${res.status}`);
         const json = await res.json();
-        console.log("[PB-SYSTEM] Data Loaded:", json.code);
+        console.log("[PB-SYSTEM V36.0] Load Complete:", json.code);
 
         const glLoading = document.getElementById('page-loading');
         if (glLoading) glLoading.style.display = 'none';
